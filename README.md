@@ -1,2 +1,2 @@
-# Student-Council-Election-System
+# Student-Council-Election
 A digital way of doing student elections.
