@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>540</x>
+      <y>20</y>
+      <w>210</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>_User Info_
+--
+user_firstname
+user_middlename
+user_lastname
+user_ID
+user_email
+user_password</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>750</x>
+      <y>220</y>
+      <w>210</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>_Candidate Info_
+--
+candidate_name
+candidate_ID
+candidate_party
+candidate_position
+candidate_platform</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>320</x>
+      <y>230</y>
+      <w>210</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>_Admin Info_
+--
+admin_firsname
+admin_lastname
+admin_ID
+admin_email
+admin_password
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>750</x>
+      <y>390</y>
+      <w>210</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>_Election_info_
+--
+election_startdate
+election_enddate
+election_voter
+election_position1
+election_position2
+....
+election_positionx
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>150</y>
+      <w>200</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>180.0;10.0;180.0;40.0;10.0;40.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>690</x>
+      <y>150</y>
+      <w>190</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0;170.0;40.0;170.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>550</x>
+      <y>610</y>
+      <w>210</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>_Party_info_
+--
+party_candidate1
+party_candidate2
+party_candidate3
+.....
+party_candidatex</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>530</y>
+      <w>190</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>170.0;10.0;170.0;50.0;10.0;50.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>850</x>
+      <y>330</y>
+      <w>30</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>620</x>
+      <y>330</y>
+      <w>220</w>
+      <h>300</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>200.0;10.0;200.0;40.0;10.0;40.0;10.0;280.0</additional_attributes>
+  </element>
+</diagram>
