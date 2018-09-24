@@ -7,9 +7,9 @@ dirname = "D:/Documents/COE125/Data Logic"
 filename = "MainDB"
 suffix = ".db"
 Path(dirname).joinpath(filename).with_suffix(suffix)
-os.path.join('D:/Documents/COE125/Data Logic/Main.db')
+os.path.join('D:/Documents/COE125/Data Logic/MainDB.db')
 
-connection = sqlite3.connect('Main.db')
+connection = sqlite3.connect('MainDB.db')
 dl = connection.cursor()
 
 
@@ -41,12 +41,11 @@ _party_candidate1 = None
 _party_candidate2 = None
 
 #voter info/student to ah
-_user_firstname = None
-_user_middlename = None
-_user_lastname = None
-_user_id = 0
+_user_name ="MERCADO, LUIS BENJAMIN (ZARATE)"
+_user_id = 2015102131
 _user_email = None
 _user_password = None
+_user_program = None
 #end my life pls
 
 
@@ -74,8 +73,8 @@ def write_party(_party_candidate1,_party_candidate2):
     dl.execute("COMMIT")
 
 #register user
-def write_user(_user_firstname,_user_middlename,_user_lastname,_user_id,user_email,user_password):
-    dl.execute("INSERT INTO admin_info values(?,?,?,?,?)",(_user_firstname,_user_middlename,_user_lastname,_user_id,user_email,user_password))
+def write_user(_user_id,user_name,user_program):
+    dl.execute("INSERT INTO admin_info values(?,?,?,?,?)",(_user_id,user_name,user_program))
     dl.execute("COMMIT")
 
 
@@ -89,8 +88,8 @@ def read_admin(_admin_email,_admin_password):
         print ("sad")
         
 #para sa login voter
-def read_user(_user_email,_user_password):
-    dl.execute("SELECT * FROM voter_info WHERE voter_email = ? AND voter_password = ?",(_user_email,_user_password)) 
+def read_user(_user_name,_user_id):
+    dl.execute("SELECT * FROM user_info WHERE user_name = ? AND user_id = ?",(_user_name,_user_id)) 
     if dl.fetchone() is not None:
         print ("YES NAKA LOGIN KA NA!!!!")
     else:
@@ -107,7 +106,6 @@ write_election(_election_startdate,_election_enddate,_election_voter,_election_p
 write_party(_party_candidate1,_party_candidate2)
 write_user(_user_firstname,_user_middlename,_user_lastname,_user_id,_user_email,_user_password)
 
-read_admin(_admin_email,_admin_password)
-read_user(_user_email,_user_password)
+read_admin(_admin_email,_admin_password)"""
+read_user(_user_name,_user_id)
 
-"""
