@@ -3,11 +3,11 @@ import os
 
 #to follow nalang yung UPDATE
 from pathlib import Path
-dirname = "C:/Users/luis_/Downloads/Downloads"
+#dirname = "C:/Users/luis_/Downloads/Downloads"
 filename = "MainDB"
 suffix = ".db"
-Path(dirname).joinpath(filename).with_suffix(suffix)
-os.path.join('C:/Users/luis_/Downloads/MainDB.db')
+#Path(dirname).joinpath(filename).with_suffix(suffix)
+os.path.join('MainDB.db')
 
 connection = sqlite3.connect('MainDB.db')
 dl = connection.cursor()

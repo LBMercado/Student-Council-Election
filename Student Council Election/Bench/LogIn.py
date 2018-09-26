@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Registration import Ui_Registration, ClickableLineEdit
+from ElectionSystem import Ui_StudentElection
 from User import User
 
 class Ui_LogIn(object):
@@ -73,11 +74,11 @@ class Ui_LogIn(object):
         self.labelMapuaLogo = QtWidgets.QLabel(LogIn)
         self.labelMapuaLogo.setObjectName("labelMapuaLogo")
         self.labelMapuaLogo.setGeometry(390,45,150,150)
-        pic = QtGui.QPixmap("MapuaLogo.png")
+        pic = QtGui.QPixmap("Resources\MapuaLogo.png")
         self.labelMapuaLogo.setPixmap(pic)
         self.emptyUsername = True
         self.emptyPassword = True
-        LogIn.setStyleSheet(open("Design.qss",'r').read())
+        LogIn.setStyleSheet(open("Resources\Design.qss",'r').read())
         self.lineEditUsername.setStyleSheet("color: gray")
         self.lineEditUsername.setText("someone@mymail.mapua.edu.ph")
         self.lineEditPassword.setStyleSheet("color: gray")
@@ -88,7 +89,7 @@ class Ui_LogIn(object):
         LogIn.setTabOrder(self.lineEditPassword, self.pushButtonLogin)
         LogIn.setTabOrder(self.pushButtonLogin, self.pushButtonCreateAccount)
         self.lineEditUsername.setCursorPosition(0)
-        LogIn.setWindowIcon(QtGui.QIcon("MapuaIcon.png"))
+        LogIn.setWindowIcon(QtGui.QIcon("Resources\MapuaIcon.png"))
         
     def retranslateUi(self, LogIn):
         _translate = QtCore.QCoreApplication.translate
@@ -109,35 +110,31 @@ class Ui_LogIn(object):
         self.lineEditUsername.returnPressed.connect(self.logIn)
         
     def logIn(self):
-        
-        user = User()
-        user.lastName = self.lineEditUsername.text()
-        user.password = self.lineEditPassword.text()
+        newUser = User()
+        newUser.SetLastName(self.lineEditUsername.text())
+        newUser.SetPassword(self.lineEditPassword.text())
         if self.emptyUsername:
-            pic = QtGui.QPixmap("errorIcon")
+            pic = QtGui.QPixmap("Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             self.labelError.setText("Please enter email.")
         elif self.emptyPassword:
-            pic = QtGui.QPixmap("errorIcon")
+            pic = QtGui.QPixmap("Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             self.labelError.setText("Please enter password.") 
-        elif user.userExists(): #email exists
-            if user.userIDExists(): #correct matching password for email        
-                mess = QtWidgets.QMessageBox()
-                mess.setWindowTitle("SUCCESS")
-                mess.setText("WELCOME")
-                mess.setWindowIcon(QtGui.QIcon("icon.png"))
-                mess.setIcon(QtWidgets.QMessageBox.Information)
-                mess.setStandardButtons(QtWidgets.QMessageBox.Ok)
-                mess.exec_()
+        elif newUser.userExists(): #email exists
+            if newUser.userIDExists(): #correct matching password for email         
+                self.StudentElection = QtWidgets.QWidget()
+                self.ui = Ui_StudentElection()
+                self.ui.setupUi(self.StudentElection)
+                self.StudentElection.show()
             else:
                 self.emptyPassword = True
                 self.resetPassword()
-                pic = QtGui.QPixmap("errorIcon")
+                pic = QtGui.QPixmap("Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)
                 self.labelError.setText("Incorrect password.")
         else:
-            pic = QtGui.QPixmap("errorIcon")
+            pic = QtGui.QPixmap("Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             self.labelError.setText("Email does not exist.")
     def createAccount(self):
@@ -186,7 +183,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     LogIn = QtWidgets.QWidget()
     ui = Ui_LogIn()
-    ui.setupUi(LogIn)
+    ui.setupUi(LogIn)   
     LogIn.show()
     sys.exit(app.exec_())
 

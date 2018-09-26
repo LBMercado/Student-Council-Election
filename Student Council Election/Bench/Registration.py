@@ -63,8 +63,8 @@ class Ui_Registration(object):
         self.emptyReenterPassword = True
         self.retranslateUi(Registration)
         QtCore.QMetaObject.connectSlotsByName(Registration)
-        Registration.setWindowIcon(QtGui.QIcon("MapuaIcon.png"))
-        Registration.setStyleSheet(open("Design.qss",'r').read())
+        Registration.setWindowIcon(QtGui.QIcon("Resources\MapuaIcon.png"))
+        Registration.setStyleSheet(open("Resources\Design.qss",'r').read())
         self.lineEditName.setCursorPosition(0)
         
     def retranslateUi(self, Registration):
@@ -90,7 +90,7 @@ class Ui_Registration(object):
         mess = QtWidgets.QMessageBox()
         mess.setWindowTitle("SUCCESS")
         mess.setText("WELCOME")
-        mess.setWindowIcon(QtGui.QIcon("icon.png"))
+        mess.setWindowIcon(QtGui.QIcon("Resources\icon.png"))
         mess.setIcon(QtWidgets.QMessageBox.Information)
         mess.setStandardButtons(QtWidgets.QMessageBox.Ok)
         mess.exec_()
