@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Registration import Ui_Registration, ClickableLineEdit
+from ElectionSystem import Ui_StudentElection
 
 class Ui_LogIn(object):
     def setupUi(self, LogIn):
@@ -120,13 +121,10 @@ class Ui_LogIn(object):
             self.labelError.setText("Please enter password.") 
         elif self.lineEditUsername.text() == username:
             if self.lineEditPassword.text() == password:         
-                mess = QtWidgets.QMessageBox()
-                mess.setWindowTitle("SUCCESS")
-                mess.setText("WELCOME")
-                mess.setWindowIcon(QtGui.QIcon("Resources\icon.png"))
-                mess.setIcon(QtWidgets.QMessageBox.Information)
-                mess.setStandardButtons(QtWidgets.QMessageBox.Ok)
-                mess.exec_()
+                self.StudentElection = QtWidgets.QWidget()
+                self.ui = Ui_StudentElection()
+                self.ui.setupUi(self.StudentElection)
+                self.StudentElection.show()
             else:
                 self.emptyPassword = True
                 self.resetPassword()
