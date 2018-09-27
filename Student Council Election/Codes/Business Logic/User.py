@@ -1,26 +1,32 @@
 #!/usr/bin/env python
 
 #import modules
+from NameToEmail import NameToEmail
 from DataLogic import read_username
 from DataLogic import write_user
 from DataLogic import read_userid
 
 class User:
-    def __init__(self, id = "19991234567", program = "CPE", firstName = "John", middleName = "Parker", lastName = "Doe",
-                 email = "jpdoe@mymail.mapua.edu.ph", password = "19991234567"):
-        self.id = id
+    def __init__(self, userId, program, firstName, middleName, lastName, password):
+        self.userId = userId
         self.program = program
-        self.firstName = firstName
-        self.middleName = middleName
-        self.lastName = lastName
-        self.email = email
-        self.password = password
+        self.firstName = firstName.lower()
+        self.middleName = middleName.lower()
+        self.lastName = lastName.lower()
+		self.password = password
 
-    def SetId(self, id):
-        self.id = id
+        # assume first name is separated by spaces, split into a list
+        firstNameList = self.firstName.split()
+        # auto-generate an email address based on firstName, middleName, and lastName
+        emailConverter = NameToEmail(firstNameList, self.middleName, self.lastName)
+        emailConverter.ConvertNameToEmail()
+        self.email = emailConverter.GetEmail()
 
-    def GetId(self):
-        return self.id
+    def SetUserId(self, userId):
+        self.userId = userId
+
+    def GetUserId(self):
+        return self.userId
 
     def SetProgram(self, program):
         self.program = program
@@ -28,23 +34,17 @@ class User:
     def GetProgram(self):
         return self.program
 
-    def SetFirstName(self, firstName):
+    def SetName(self, firstName, middleName, lastName):
         self.firstName = firstName
-
-    def GetFirstName(self):
-        return self.firstName
-
-    def SetMidName(self, middleName):
         self.middleName = middleName
+        self.lastName = lastName
 
-    def GetMidName(self):
-        return self.middleName
-
-    def SetLastName(self, LastName):
-        self.lastName = LastName
-
-    def GetLastName(self):
-        return self.lastName
+        # assume first name is separated by spaces, split into a list
+        firstNameList = self.firstName.split()
+        # auto-generate an email address based on firstName, middleName, and lastName
+        emailConverter = NameToEmail(firstNameList, self.middleName, self.lastName)
+        emailConverter.ConvertNameToEmail()
+        self.email = emailConverter.GetEmail()
 
     def SetEmail(self, email):
         self.email = email
@@ -59,9 +59,6 @@ class User:
         return self.password
     
     def userExists(self):
-        #fullName = self.lastName + ", " + self.firstName + "(" + self.middleName + ")"
-        #fullName = fullName.upper()
-        #return read_user(fullName, self.id)
         return read_username(self.lastName)
     
     def userIDExists(self):
