@@ -1,45 +1,48 @@
 #!/usr/bin/env python
 
-#import modules
+from NameToEmail import NameToEmail
 
 class User:
-    def __init__(self):
-        self.id = 0
-        self.firstName = "John"
-        self.middleName = "P"
-        self.lastName = "Doe"
-        self.email = "jpdoe@mymail.mapua.edu.ph"
+    def __init__(self, userId, program, firstName, middleName, lastName):
+        self.userId = userId
+        self.program = program
+        self.firstName = firstName.lower()
+        self.middleName = middleName.lower()
+        self.lastName = lastName.lower()
 
-    def __init__(self, id,firstName, middleName, lastName, email):
-        self.id = id
-        self.firstName = firstName
-        self.middleName = middleName
-        self.lastName = lastName
-        self.email = email
+        # assume first name is separated by spaces, split into a list
+        firstNameList = self.firstName.split()
+        # auto-generate an email address based on firstName, middleName, and lastName
+        emailConverter = NameToEmail(firstNameList, self.middleName, self.lastName)
+        emailConverter.ConvertNameToEmail()
+        self.email = emailConverter.GetEmail()
 
-    def SetId(self, id):
-        self.id = id
+    def SetUserId(self, userId):
+        self.userId = userId
 
-    def GetId(self):
-        return self.id
-
-    def SetFirstName(self, firstName):
-        self.firstName = firstName
+    def GetUserId(self):
+        return self.userId
 
     def GetFirstName(self):
         return self.firstName
 
-    def SetMidName(self, middleName):
-        self.middleName = middleName
-
     def GetMidName(self):
         return self.middleName
 
-    def SetLastName(self, LastName):
-        self.lastName = LastName
-
     def GetLastName(self):
         return self.lastName
+
+    def SetName(self, firstName, middleName, lastName):
+        self.firstName = firstName
+        self.middleName = middleName
+        self.lastName = lastName
+
+        # assume first name is separated by spaces, split into a list
+        firstNameList = self.firstName.split()
+        # auto-generate an email address based on firstName, middleName, and lastName
+        emailConverter = NameToEmail(firstNameList, self.middleName, self.lastName)
+        emailConverter.ConvertNameToEmail()
+        self.email = emailConverter.GetEmail()
 
     def SetEmail(self, email):
         self.email = email
