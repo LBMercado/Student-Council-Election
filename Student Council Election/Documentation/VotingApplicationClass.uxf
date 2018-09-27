@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1360</x>
+      <y>520</y>
+      <w>210</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>Candidate
+--
+-position: String
+-party: String
+-platform: String
+--
++SetPosition()
++SetParty()
++SetPlatform()
++GetPosition()
++GetParty()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1070</x>
+      <y>130</y>
+      <w>210</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>User
+--
+-id: Long
+-lastName: String
+-firstName: String
+-middleName: String
+--
++SetId()
++SetLastName()
++SetFirstName()
++SetMiddleName()
++GetId()
++GetLastName()
++GetFirstName()
++GetMiddleName()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>720</x>
+      <y>520</y>
+      <w>210</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>Admin
+--
+--
++AddUser()
++RemoveUser()
++GetUser()
++SeeVotesForCandidate()
++StartElectionOn()
++EndElectionOn()
++EndElection()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1070</x>
+      <y>790</y>
+      <w>210</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>VoteTicket
+--
+-voterId: long
+-candId: long
+--
++GetVoterId()
++GetCandId()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>720</x>
+      <y>790</y>
+      <w>210</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>Election
+--
+-startDate: string
+-endDate: string
+-party: Party[1..*]
+-voter: Voter[1..*]
+-voteReceipt: VoteTicket[0..*]
+--
++GetStartDate()
++SetEndDate()
++GetEndDate()
++AddParty()
++GetPartyList()
++GetVoterList()
++AddVoteReceipt()
++GetVotesFor()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1070</x>
+      <y>520</y>
+      <w>210</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Voter
+--
++vote: VoteTicket[0..*]
+--
++VoteFor()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1160</x>
+      <y>360</y>
+      <w>30</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1200</x>
+      <y>360</y>
+      <w>290</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0;270.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>820</x>
+      <y>360</y>
+      <w>330</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>310.0;10.0;310.0;90.0;10.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1160</x>
+      <y>590</y>
+      <w>30</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;200.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>920</x>
+      <y>870</y>
+      <w>170</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;150.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>810</x>
+      <y>700</y>
+      <w>30</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1360</x>
+      <y>1030</y>
+      <w>210</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>Party
+--
+-candidate: Candidate[1..*]
+-name: String
+--
++SetName()
++GetName()
++GetCandidate()
++AddCandidate()
++RemoveCandidate()</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1450</x>
+      <y>690</y>
+      <w>50</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1..*</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;340.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>810</x>
+      <y>1030</y>
+      <w>570</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;110.0;550.0;110.0</additional_attributes>
+  </element>
+</diagram>
