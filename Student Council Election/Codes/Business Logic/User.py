@@ -1,14 +1,19 @@
 #!/usr/bin/env python
 
+#import modules
 from NameToEmail import NameToEmail
+from DataLogic import read_username
+from DataLogic import write_user
+from DataLogic import read_userid
 
 class User:
-    def __init__(self, userId, program, firstName, middleName, lastName):
+    def __init__(self, userId, program, firstName, middleName, lastName, password):
         self.userId = userId
         self.program = program
         self.firstName = firstName.lower()
         self.middleName = middleName.lower()
         self.lastName = lastName.lower()
+		self.password = password
 
         # assume first name is separated by spaces, split into a list
         firstNameList = self.firstName.split()
@@ -23,14 +28,11 @@ class User:
     def GetUserId(self):
         return self.userId
 
-    def GetFirstName(self):
-        return self.firstName
+    def SetProgram(self, program):
+        self.program = program
 
-    def GetMidName(self):
-        return self.middleName
-
-    def GetLastName(self):
-        return self.lastName
+    def GetProgram(self):
+        return self.program
 
     def SetName(self, firstName, middleName, lastName):
         self.firstName = firstName
@@ -49,3 +51,15 @@ class User:
 
     def GetEmail(self):
         return self.email
+
+    def SetPassword(self, password):
+        self.password = password
+
+    def GetPassword(self):
+        return self.password
+    
+    def userExists(self):
+        return read_username(self.lastName)
+    
+    def userIDExists(self):
+        return read_userid(self.lastName, self.password)
