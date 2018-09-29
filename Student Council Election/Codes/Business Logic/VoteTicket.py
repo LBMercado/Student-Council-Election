@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
-#import modules
-import User, Candidate
-
 class VoterTicket:
-    def __init__(self, voter, candidate):
-        self.voterId = voter.id
-        self.candidateId = candidate.id
+    def __init__(self, voterId, candidateId):
+        self.voterId = voterId
+        self.candidateId = candidateId
 
     def GetVoterId(self):
         return self.voterId

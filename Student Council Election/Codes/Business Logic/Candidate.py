@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
 #import modules
-import User.py
+from User import User
 
 class Candidate(User):
-    def __init__(self, id, firstName, middleName, lastName, email, position, party):
-        User.__init__(self, id, firstName, middleName, lastName, email)
+    def __init__(self, userId, program, firstName, middleName, lastName, password, position, party):
+        User.__init__(self, userId, program, firstName, middleName, lastName, password)
         self.position = position
         self.party = party
-        self.platform = ""
+        self.platform = "This candidate has no platform at this time."
 
     def SetPosition(self, position):
         self.position = position
