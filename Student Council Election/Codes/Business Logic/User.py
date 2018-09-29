@@ -3,7 +3,6 @@
 #import modules
 from NameToEmail import NameToEmail
 from DataLogic import read_username
-from DataLogic import write_user
 from DataLogic import read_userid
 
 class User:
@@ -13,7 +12,7 @@ class User:
         self.firstName = firstName.lower()
         self.middleName = middleName.lower()
         self.lastName = lastName.lower()
-		self.password = password
+        self.password = password
 
         # assume first name is separated by spaces, split into a list
         firstNameList = self.firstName.split()
@@ -63,3 +62,6 @@ class User:
     
     def userIDExists(self):
         return read_userid(self.lastName, self.password)
+
+    def isAdmin(self):
+        return False
