@@ -2,17 +2,20 @@
 
 #import modules
 from NameToEmail import NameToEmail
-from DataLogic import read_username
-from DataLogic import read_userid
 
 class User:
-    def __init__(self, userId, program, firstName, middleName, lastName, password):
+    def __init__(self, userId, program, firstName, middleName, lastName, password = None):
         self.userId = userId
         self.program = program
         self.firstName = firstName.lower()
         self.middleName = middleName.lower()
         self.lastName = lastName.lower()
-        self.password = password
+
+        #If no supplied password, default password is userId
+        if password is not None:
+            self.password = userId
+        else:
+            self.password = password
 
         # assume first name is separated by spaces, split into a list
         firstNameList = self.firstName.split()
@@ -20,9 +23,6 @@ class User:
         emailConverter = NameToEmail(firstNameList, self.middleName, self.lastName)
         emailConverter.ConvertNameToEmail()
         self.email = emailConverter.GetEmail()
-
-    def SetUserId(self, userId):
-        self.userId = userId
 
     def GetUserId(self):
         return self.userId
@@ -32,6 +32,15 @@ class User:
 
     def GetProgram(self):
         return self.program
+
+    def GetFirstName(self):
+        return self.firstName
+
+    def GetMidName(self):
+        return self.middleName
+
+    def GetLastName(self):
+        return self.lastName
 
     def SetName(self, firstName, middleName, lastName):
         self.firstName = firstName
@@ -45,9 +54,6 @@ class User:
         emailConverter.ConvertNameToEmail()
         self.email = emailConverter.GetEmail()
 
-    def SetEmail(self, email):
-        self.email = email
-
     def GetEmail(self):
         return self.email
 
@@ -56,12 +62,6 @@ class User:
 
     def GetPassword(self):
         return self.password
-    
-    def userExists(self):
-        return read_username(self.lastName)
-    
-    def userIDExists(self):
-        return read_userid(self.lastName, self.password)
 
     def isAdmin(self):
         return False
