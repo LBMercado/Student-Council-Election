@@ -6,11 +6,65 @@ QListWidget{
 	color: white;
 	border: 0px;
 }
+QPushButton#pushButtonCreate {
+	background-color: #FF0000;
+	color: white;
+}
+QComboBox{
+	background-color: FF0000;
+	color: white;
+}
+QPushButton#pushButtonEdit {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonDelete {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonSearch {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonSearchEdit {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonCreateUser {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonDeleteUser {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonEditUser {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonSummary {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonStartElec {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonEndElec {
+	background-color: #FF0000;
+	color: white;
+}
 QPushButton#pushButtonLogin {
 	background-color: #FF0000;
 	color: white;
 }
 QPushButton#pushButtonSignout {
+	background-color: transparent;
+	color: gray;
+	border: 3px solid gray;
+	border-radius: 20px;
+}
+QPushButton#pushButton {
 	background-color: transparent;
 	color: gray;
 	border: 3px solid gray;
@@ -94,6 +148,10 @@ QPushButton#pushButtonNext::hover{
 	color: #FF0000;
 }
 QPushButton#pushButtonSignout::hover{
+	border-color: #FF0000;
+	color: #FF0000;
+}
+QPushButton#pushButton::hover{
 	border-color: #FF0000;
 	color: #FF0000;
 }

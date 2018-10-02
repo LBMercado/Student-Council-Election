@@ -6,16 +6,16 @@
 #
 # WARNING! All changes made in this file will be lost!
 import os
-dirDataLogic = (os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Data Access Logic\\")
-import sys
-sys.path.insert(0,dirDataLogic)
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Registration import Ui_Registration
-from StudentCouncilElection import Ui_StudentCouncilElection
-from User import User
+from UI.Registration import Ui_Registration
+from UI.StudentCouncilElection import Ui_StudentCouncilElection
+from UI.Admin import Ui_Admin
+from BusinessLogic.User import User
+from DataAccess.DataAccess import DataAccess
 
 class Ui_LogIn(object):
     def setupUi(self, LogIn):
+        self.LogIn = LogIn
         LogIn.setObjectName("LogIn")
         LogIn.setFixedSize(630, 507)
 #        LogIn.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -76,18 +76,20 @@ class Ui_LogIn(object):
         self.labelMapuaLogo = QtWidgets.QLabel(LogIn)
         self.labelMapuaLogo.setObjectName("labelMapuaLogo")
         self.labelMapuaLogo.setGeometry(390,45,150,150)
-        pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
-        + "\Resources\MapuaLogo.png")
+        projDirectory = os.path.normpath(os.getcwd() + os.sep + os.pardir) + '\PyCharm_Project_Env'
+        pic = QtGui.QPixmap(projDirectory + "\Resources\MapuaLogo.png")
         self.labelMapuaLogo.setPixmap(pic)
-        directory = os.path.normpath(os.getcwd() + os.sep + os.pardir)
-        directory = directory.replace("\\", "/")
-        background = ("QWidget#LogIn{background-image: url(\""+directory
+        projDirectory = projDirectory.replace("\\", "/")
+        background = ("QWidget#LogIn{background-image: url(\""+projDirectory
                             +"/Resources/LogInBackground.jpg\"); background-position: center;}")
-        LogIn.setStyleSheet(background + open(os.path.normpath(os.getcwd() + os.sep + os.pardir)
+        LogIn.setStyleSheet(background + open(projDirectory
         + "\Resources\Design.qss",'r').read())
         self.StudentCouncilElection = QtWidgets.QWidget()
         self.ui = Ui_StudentCouncilElection()
         self.ui.setupUi(self.StudentCouncilElection)
+        self.Admin = QtWidgets.QWidget()
+        self.uiAdmin = Ui_Admin()
+        self.uiAdmin.setupUi(self.Admin)
         self.retranslateUi(LogIn)
         
         self.lineEditPassword.setStyleSheet("color: gray")
@@ -98,7 +100,7 @@ class Ui_LogIn(object):
         LogIn.setTabOrder(self.lineEditUsername, self.lineEditPassword)
         LogIn.setTabOrder(self.lineEditPassword, self.pushButtonLogin)
         LogIn.setTabOrder(self.pushButtonLogin, self.pushButtonCreateAccount)
-        LogIn.setWindowIcon(QtGui.QIcon(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
+        LogIn.setWindowIcon(QtGui.QIcon(projDirectory
         + "\Resources\MapuaIcon.png"))      
         
     def retranslateUi(self, LogIn):
@@ -115,24 +117,26 @@ class Ui_LogIn(object):
         self.lineEditPassword.textChanged.connect(self.inputPass)
         self.lineEditUsername.textChanged.connect(self.inputUser)
         self.ui.pushButtonSignout.clicked.connect(self.reLogIn)
+        self.uiAdmin.pushButton.clicked.connect(self.reLogInAdmin)
         
     def logIn(self):
-        newUser = User()
-        newUser.SetLastName(self.lineEditUsername.text())
-        newUser.SetPassword(self.lineEditPassword.text())
-        if self.lineEditUsername.text() == "":
+        datAcc = DataAccess()
+        inputUsername = self.lineEditUsername.text()
+        inputPassword = self.lineEditPassword.text()
+        
+        if inputUsername == "":
             pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             self.labelError.setText("Please enter email.")
-        elif self.lineEditPassword.text() == "":
+        elif inputPassword == "":
             pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             self.labelError.setText("Please enter password.") 
-        elif newUser.userExists(): #email exists
-            if newUser.userIDExists(): #correct matching password for email   
+        elif datAcc.read_username(inputUsername): #email exists
+            if datAcc.read_userId(inputUsername, inputPassword): #correct matching password for email
                 self.StudentCouncilElection.show()
-                self.ui.setProfile(self.lineEditUsername.text(), self.lineEditPassword.text())
-                LogIn.hide()
+                self.ui.setProfile(inputUsername, inputPassword)
+                self.LogIn.hide()
             else:
                 self.emptyPassword = True
                 self.resetPassword()
@@ -140,6 +144,10 @@ class Ui_LogIn(object):
                 + "\Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)
                 self.labelError.setText("Incorrect password.")
+        elif self.lineEditUsername.text() == "1":
+            if self.lineEditPassword.text() == "1":
+                self.Admin.show()
+                self.LogIn.hide()
         else:
             pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
             + "\Resources\errorIcon")
@@ -152,7 +160,10 @@ class Ui_LogIn(object):
         self.Registration.show()
     def reLogIn(self):
         self.StudentCouncilElection.close()
-        LogIn.show()
+        self.LogIn.show()
+    def reLogInAdmin(self):
+        self.Admin.close()
+        self.LogIn.show()
     def inputUser(self):
         self.lineEditUsername.setStyleSheet("color: white")
         if self.lineEditUsername.text() == "":
@@ -163,12 +174,3 @@ class Ui_LogIn(object):
         if self.lineEditPassword.text() == "":
             self.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Normal)
             self.lineEditPassword.setStyleSheet("color: gray")
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    LogIn = QtWidgets.QWidget()
-    ui = Ui_LogIn()
-    ui.setupUi(LogIn)   
-    LogIn.show()
-    sys.exit(app.exec_())
-

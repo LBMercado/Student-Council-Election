@@ -13,7 +13,7 @@ class Ui_StudentCouncilElection(object):
         self.fullName = "LastName, GivenName MI"
         self.email = "someone@mymail.mapua.edu.ph"
         StudentCouncilElection.setObjectName("StudentCouncilElection")
-        StudentCouncilElection.resize(1200, 600)
+        StudentCouncilElection.setFixedSize(1200, 600)
         self.listWidget = QtWidgets.QListWidget(StudentCouncilElection)
         self.listWidget.setGeometry(QtCore.QRect(20, 80, 91, 401))
         self.listWidget.setObjectName("listWidget")
@@ -211,16 +211,13 @@ class Ui_StudentCouncilElection(object):
         font.setPointSize(15)
         self.labelProfile.setFont(font)
         self.index = 0
-        directory = os.path.normpath(os.getcwd() + os.sep + os.pardir)
-        directory = directory.replace("\\", "/")
-        background = ("QWidget#StudentCouncilElection{background-image: url(\"" + directory
+        projDirectory = os.path.normpath(os.getcwd() + os.sep + os.pardir) + '\PyCharm_Project_Env'
+        projDirectory = projDirectory.replace("\\", "/")
+        background = ("QWidget#StudentCouncilElection{background-image: url(\"" + projDirectory
                             +"/Resources/LogInBackground.jpg\"); background-position: center;}")
-        StudentCouncilElection.setStyleSheet(background + open((os.path.normpath(os.getcwd() 
-                + os.sep + os.pardir)) + "\Resources\Design.qss",'r').read())
-        StudentCouncilElection.setWindowIcon(QtGui.QIcon(os.path.normpath(os.getcwd() 
-                + os.sep + os.pardir) + "\Resources\MapuaIcon.png"))
-        pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
-                + "\Resources\MapuaLogo.png")
+        StudentCouncilElection.setStyleSheet(background + open(projDirectory + "\Resources\Design.qss",'r').read())
+        StudentCouncilElection.setWindowIcon(QtGui.QIcon(projDirectory + "\Resources\MapuaIcon.png"))
+        pic = QtGui.QPixmap(projDirectory + "\Resources\MapuaLogo.png")
         self.labelPic1.setPixmap(pic)
         self.retranslateUi(StudentCouncilElection)
         QtCore.QMetaObject.connectSlotsByName(StudentCouncilElection)
@@ -284,6 +281,7 @@ class Ui_StudentCouncilElection(object):
             self.labelPosition.setText("FINANCE")
     def setProfile(self, fullName, email):
         self.labelProfile.setText(fullName + "\n" + email)
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
