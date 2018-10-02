@@ -5,18 +5,18 @@
 # Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
-
+import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_StudentElection(object):
     def setupUi(self, StudentElection):
         StudentElection.setObjectName("StudentElection")
-        StudentElection.resize(526, 392)
+        StudentElection.setFixedSize(1000, 600)
         self.pushButtonNext = QtWidgets.QPushButton(StudentElection)
-        self.pushButtonNext.setGeometry(QtCore.QRect(474, 0, 51, 391))
+        self.pushButtonNext.setGeometry(QtCore.QRect(949, 0, 51, 600))
         self.pushButtonNext.setObjectName("pushButtonNext")
         self.pushButtonPrev = QtWidgets.QPushButton(StudentElection)
-        self.pushButtonPrev.setGeometry(QtCore.QRect(0, 0, 51, 391))
+        self.pushButtonPrev.setGeometry(QtCore.QRect(0, 0, 51, 600))
         self.pushButtonPrev.setObjectName("pushButtonPrev")
         self.label = QtWidgets.QLabel(StudentElection)
         self.label.setGeometry(QtCore.QRect(230, 10, 91, 31))
@@ -36,9 +36,16 @@ class Ui_StudentElection(object):
         self.pushButton = QtWidgets.QPushButton(StudentElection)
         self.pushButton.setGeometry(QtCore.QRect(150, 350, 241, 31))
         self.pushButton.setObjectName("pushButton")
+        directory = os.path.normpath(os.getcwd() + os.sep + os.pardir)
+        directory = directory.replace("\\", "/")
+        background = ("QWidget#StudentElection{background-image: url(\"" + directory
+                            +"/Resources/ElectionSystem.jpg\"); background-position: center;}")
+        StudentElection.setStyleSheet(background + open((os.path.normpath(os.getcwd() + os.sep + os.pardir)) +
+                                         "\Resources\Design.qss",'r').read())
 
         self.retranslateUi(StudentElection)
         QtCore.QMetaObject.connectSlotsByName(StudentElection)
+        
 
     def retranslateUi(self, StudentElection):
         _translate = QtCore.QCoreApplication.translate
@@ -50,3 +57,11 @@ class Ui_StudentElection(object):
         self.radioButton_2.setText(_translate("StudentElection", "Name:"))
         self.pushButton.setText(_translate("StudentElection", "Submit"))
 
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    StudentElection = QtWidgets.QWidget()
+    ui = Ui_StudentElection()
+    ui.setupUi(StudentElection)
+    StudentElection.show()
+    sys.exit(app.exec_())

@@ -5,32 +5,35 @@
 # Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
-
+import os
+dirDataLogic = (os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Data Access Logic\\")
+import sys
+sys.path.insert(0,dirDataLogic)
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Registration import Ui_Registration, ClickableLineEdit
-from ElectionSystem import Ui_StudentElection
+from Registration import Ui_Registration
+from StudentCouncilElection import Ui_StudentCouncilElection
+from User import User
 
 class Ui_LogIn(object):
     def setupUi(self, LogIn):
         LogIn.setObjectName("LogIn")
-        LogIn.resize(630, 507)
         LogIn.setFixedSize(630, 507)
 #        LogIn.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.pushButtonLogin = QtWidgets.QPushButton(LogIn)
         self.pushButtonLogin.setGeometry(QtCore.QRect(320, 340, 290, 51))
         self.pushButtonLogin.setObjectName("pushButtonLogin")
         self.pushButtonLogin.setAutoDefault(True)
-        self.lineEditUsername = ClickableLineEdit(LogIn)
+        self.lineEditUsername = QtWidgets.QLineEdit(LogIn)
         self.lineEditUsername.setGeometry(QtCore.QRect(320, 220, 290, 31))
         font = QtGui.QFont()
         font.setFamily("Yu Gothic UI Semibold")
-        font.setPointSize(14)
+        font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
         self.lineEditUsername.setFont(font)
         self.lineEditUsername.setText("")
         self.lineEditUsername.setObjectName("lineEditUsername")
-        self.lineEditPassword = ClickableLineEdit(LogIn)
+        self.lineEditPassword = QtWidgets.QLineEdit(LogIn)
         self.lineEditPassword.setGeometry(QtCore.QRect(320, 260, 290, 31))
         self.lineEditPassword.setFont(font)
         self.lineEditPassword.setText("")
@@ -73,22 +76,30 @@ class Ui_LogIn(object):
         self.labelMapuaLogo = QtWidgets.QLabel(LogIn)
         self.labelMapuaLogo.setObjectName("labelMapuaLogo")
         self.labelMapuaLogo.setGeometry(390,45,150,150)
-        pic = QtGui.QPixmap("Resources\MapuaLogo.png")
+        pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
+        + "\Resources\MapuaLogo.png")
         self.labelMapuaLogo.setPixmap(pic)
-        self.emptyUsername = True
-        self.emptyPassword = True
-        LogIn.setStyleSheet(open("Resources\Design.qss",'r').read())
-        self.lineEditUsername.setStyleSheet("color: gray")
-        self.lineEditUsername.setText("someone@mymail.mapua.edu.ph")
-        self.lineEditPassword.setStyleSheet("color: gray")
-        self.lineEditPassword.setText("Password")
+        directory = os.path.normpath(os.getcwd() + os.sep + os.pardir)
+        directory = directory.replace("\\", "/")
+        background = ("QWidget#LogIn{background-image: url(\""+directory
+                            +"/Resources/LogInBackground.jpg\"); background-position: center;}")
+        LogIn.setStyleSheet(background + open(os.path.normpath(os.getcwd() + os.sep + os.pardir)
+        + "\Resources\Design.qss",'r').read())
+        self.StudentCouncilElection = QtWidgets.QWidget()
+        self.ui = Ui_StudentCouncilElection()
+        self.ui.setupUi(self.StudentCouncilElection)
         self.retranslateUi(LogIn)
+        
+        self.lineEditPassword.setStyleSheet("color: gray")
+        self.lineEditUsername.setStyleSheet("color: gray")
+        self.lineEditPassword.setPlaceholderText("Password")
+        self.lineEditUsername.setPlaceholderText("someone@mymail.mapua.edu.ph")
         QtCore.QMetaObject.connectSlotsByName(LogIn)
         LogIn.setTabOrder(self.lineEditUsername, self.lineEditPassword)
         LogIn.setTabOrder(self.lineEditPassword, self.pushButtonLogin)
         LogIn.setTabOrder(self.pushButtonLogin, self.pushButtonCreateAccount)
-        self.lineEditUsername.setCursorPosition(0)
-        LogIn.setWindowIcon(QtGui.QIcon("Resources\MapuaIcon.png"))
+        LogIn.setWindowIcon(QtGui.QIcon(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
+        + "\Resources\MapuaIcon.png"))      
         
     def retranslateUi(self, LogIn):
         _translate = QtCore.QCoreApplication.translate
@@ -96,43 +107,42 @@ class Ui_LogIn(object):
         self.pushButtonLogin.setText(_translate("LogIn", "LOGIN"))
         self.pushButtonCreateAccount.setText(_translate("LogIn", "REGISTER"))
         self.label.setText(_translate("LogIn", "<html><head/><body><p>Welcome </p><p>to the</p><p>Student Council </p><p>Election</p></body></html>"))
-        self.lineEditUsername.textEdited.connect(self.removeUsername)
-        self.lineEditPassword.textEdited.connect(self.removePassword)
         self.pushButtonLogin.clicked.connect(self.logIn)
         self.pushButtonCreateAccount.clicked.connect(self.createAccount)
-        self.lineEditUsername.clicked.connect(self.usernameClicked)
-        self.lineEditUsername.editingFinished.connect(self.resetUsername)
-        self.lineEditPassword.clicked.connect(self.passwordCLicked)
-        self.lineEditPassword.editingFinished.connect(self.resetPassword)
         self.pushButtonCreateAccount.mouseMoveEvent
         self.lineEditPassword.returnPressed.connect(self.logIn)
         self.lineEditUsername.returnPressed.connect(self.logIn)
+        self.lineEditPassword.textChanged.connect(self.inputPass)
+        self.lineEditUsername.textChanged.connect(self.inputUser)
+        self.ui.pushButtonSignout.clicked.connect(self.reLogIn)
         
     def logIn(self):
-        username = "ltan"
-        password = "1"
-        if self.emptyUsername:
-            pic = QtGui.QPixmap("Resources\errorIcon")
+        newUser = User()
+        newUser.SetLastName(self.lineEditUsername.text())
+        newUser.SetPassword(self.lineEditPassword.text())
+        if self.lineEditUsername.text() == "":
+            pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             self.labelError.setText("Please enter email.")
-        elif self.emptyPassword:
-            pic = QtGui.QPixmap("Resources\errorIcon")
+        elif self.lineEditPassword.text() == "":
+            pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             self.labelError.setText("Please enter password.") 
-        elif self.lineEditUsername.text() == username:
-            if self.lineEditPassword.text() == password:         
-                self.StudentElection = QtWidgets.QWidget()
-                self.ui = Ui_StudentElection()
-                self.ui.setupUi(self.StudentElection)
-                self.StudentElection.show()
+        elif newUser.userExists(): #email exists
+            if newUser.userIDExists(): #correct matching password for email   
+                self.StudentCouncilElection.show()
+                self.ui.setProfile(self.lineEditUsername.text(), self.lineEditPassword.text())
+                LogIn.hide()
             else:
                 self.emptyPassword = True
                 self.resetPassword()
-                pic = QtGui.QPixmap("Resources\errorIcon")
+                pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
+                + "\Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)
                 self.labelError.setText("Incorrect password.")
         else:
-            pic = QtGui.QPixmap("Resources\errorIcon")
+            pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
+            + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             self.labelError.setText("Email does not exist.")
     def createAccount(self):
@@ -140,42 +150,19 @@ class Ui_LogIn(object):
         self.ui = Ui_Registration()
         self.ui.setupUi(self.Registration)
         self.Registration.show()
-        
-    def removeUsername(self):
-        if self.emptyUsername:
-            self.emptyUsername = False
-            self.lineEditUsername.setStyleSheet("color: white;")
-            self.lineEditUsername.setText(self.lineEditUsername.text()[0])     
-    def removePassword(self):
-        if self.emptyPassword:
-            self.emptyPassword = False
-            self.lineEditPassword.setStyleSheet("color: white;")
-            self.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Password)
-            self.lineEditPassword.setText(self.lineEditPassword.text()[0])
-            
-    def resetUsername(self):
-        if len(self.lineEditUsername.text()) == 0:
-            self.emptyUsername = True
-        if self.emptyUsername:
-            self.lineEditUsername.setStyleSheet("color: gray;")
-            self.lineEditUsername.setText("someone@mymail.mapua.edu.ph") 
-    def resetPassword(self):
-        if len(self.lineEditPassword.text()) == 0:
-            self.emptyPassword = True
-        if self.emptyPassword:
+    def reLogIn(self):
+        self.StudentCouncilElection.close()
+        LogIn.show()
+    def inputUser(self):
+        self.lineEditUsername.setStyleSheet("color: white")
+        if self.lineEditUsername.text() == "":
+            self.lineEditUsername.setStyleSheet("color: gray")
+    def inputPass(self):
+        self.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.lineEditPassword.setStyleSheet("color: white")
+        if self.lineEditPassword.text() == "":
             self.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Normal)
-            self.lineEditPassword.setStyleSheet("color: gray;")
-            self.lineEditPassword.setText("Password")
-            self.lineEditPassword.setCursorPosition(0)
-            
-    def usernameClicked(self):
-        if self.lineEditUsername.text() == "someone@mymail.mapua.edu.ph":
-            self.lineEditUsername.setCursorPosition(0)
-        
-    def passwordCLicked(self):
-        if self.lineEditPassword.text() == "Password":
-            self.lineEditPassword.setCursorPosition(0)
-        
+            self.lineEditPassword.setStyleSheet("color: gray")
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
