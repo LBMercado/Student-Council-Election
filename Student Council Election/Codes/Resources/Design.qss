@@ -1,19 +1,101 @@
-QWidget#LogIn {
-	background-image: url(LogInBackground.jpg);
-	background-position: center;
+QWidget{
+	background-color: transparent;
 }
-QWidget#Registration{
-	background-image: url(LogInBackground.jpg);
-	background-position: center; 
+QListWidget{
+	background-color: transparent;
+	color: white;
+	border: 0px;
+}
+QPushButton#pushButtonCreate {
+	background-color: #FF0000;
+	color: white;
+}
+QComboBox{
+	background-color: FF0000;
+	color: white;
+}
+QPushButton#pushButtonEdit {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonDelete {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonSearch {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonSearchEdit {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonCreateUser {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonDeleteUser {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonEditUser {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonSummary {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonStartElec {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonEndElec {
+	background-color: #FF0000;
+	color: white;
 }
 QPushButton#pushButtonLogin {
 	background-color: #FF0000;
 	color: white;
 }
+QPushButton#pushButtonSignout {
+	background-color: transparent;
+	color: gray;
+	border: 3px solid gray;
+	border-radius: 20px;
+}
+QPushButton#pushButton {
+	background-color: transparent;
+	color: gray;
+	border: 3px solid gray;
+	border-radius: 20px;
+}
+QPushButton#pushButtonChangePass {
+	background-color: #FF0000;
+	color: white;
+}
+QScrollArea{
+	border: 0px;
+	background-color: transparent;
+}
 QPushButton#pushButtonCreateAccount{
 	background-color: transparent;
 	color: gray;
 	border: 1px solid gray;
+}
+QPushButton#pushButtonSubmit{
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonPrev{
+	background-color: transparent;
+	color: gray;
+	border: 0px;
+}
+QPushButton#pushButtonNext{
+	background-color: transparent;
+	color: gray;
+	border: 0px;
 }
 QPushButton#pushButtonRegister{
 	background-color: #FF0000;
@@ -29,15 +111,47 @@ QLineEdit{
 QLineEdit::hover{
 	border-bottom-color: white;
 }
+QLabel{
+	color: white;
+	weight: 5px;
+}
+QRadioButton{
+	color: white;
+	weight: 5px;
+}
 QLabel#label{
 	color: #DAA520;
 	weight: 2px;
+}
+QLabel#labelProfile{
+	color: #DAA520;
+	weight: 2px;
+}
+QLabel#labelPosition{
+	color: white;
+	weight: 10px;
 }
 QLabel#labelError{
 	color: #FF0000;
 	weight: 2px;
 }
 QPushButton#pushButtonCreateAccount::hover{
+	border-color: #FF0000;
+	color: #FF0000;
+}
+QPushButton#pushButtonPrev::hover{
+	border-color: #FF0000;
+	color: #FF0000;
+}
+QPushButton#pushButtonNext::hover{
+	border-color: #FF0000;
+	color: #FF0000;
+}
+QPushButton#pushButtonSignout::hover{
+	border-color: #FF0000;
+	color: #FF0000;
+}
+QPushButton#pushButton::hover{
 	border-color: #FF0000;
 	color: #FF0000;
 }
