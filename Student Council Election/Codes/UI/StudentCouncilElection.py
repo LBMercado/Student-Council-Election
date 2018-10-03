@@ -211,6 +211,7 @@ class Ui_StudentCouncilElection(object):
         font.setPointSize(15)
         self.labelProfile.setFont(font)
         self.index = 0
+        print(os.getcwd())
         projDirectory = os.path.normpath(os.getcwd() + os.sep + os.pardir) + '\PyCharm_Project_Env'
         projDirectory = projDirectory.replace("\\", "/")
         background = ("QWidget#StudentCouncilElection{background-image: url(\"" + projDirectory

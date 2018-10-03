@@ -3,9 +3,11 @@ from BusinessLogic.Position import Position
 from BusinessLogic.Party import Party
 from BusinessLogic.VoteTicket import VoterTicket
 from BusinessLogic.Election import Election
+from UI.LogIn import Ui_LogIn
 from DataAccess.DataAccess import DataAccess
+from PyQt5 import QtWidgets
 from datetime import datetime
-import unittest
+import unittest, sys
 
 class TestCases(unittest.TestCase):
     #   Business Logic Test 1
@@ -116,3 +118,62 @@ class TestCases(unittest.TestCase):
         count = newElection.GetVotesFor(cand2.GetUserId())
         print('Votes for ' + cand2.GetLastName() + ' is ' + str(count))
         print('TEST CASE 3 PASSED')
+
+    #   Business + Data Access + UI Integration Test 1: Login interface
+    def testCase4(self):
+        #   load application
+        app = QtWidgets.QApplication(sys.argv)
+        LogIn = QtWidgets.QWidget()
+        ui = Ui_LogIn()
+        ui.setupUi(LogIn)
+
+        #   test cases for login:
+        print('Test 1: Blank input')
+        ui.lineEditUsername.setText('')
+        ui.lineEditPassword.setText('')
+        print('Username: ' + ui.lineEditUsername.text())
+        print('Password: ' + ui.lineEditPassword.text())
+        print('Output: ' + ui.labelError.text())
+        ui.logIn()
+
+        print('Test 2: Blank email, any password')
+        ui.lineEditUsername.setText('')
+        ui.lineEditPassword.setText('foobar')
+        print('Username: ' + ui.lineEditUsername.text())
+        print('Password: ' + ui.lineEditPassword.text())
+        print('Output: ' + ui.labelError.text())
+        ui.logIn()
+
+        print('Test 3: any email, blank password')
+        ui.lineEditUsername.setText('foobar')
+        ui.lineEditPassword.setText('')
+        print('Username: ' + ui.lineEditUsername.text())
+        print('Password: ' + ui.lineEditPassword.text())
+        print('Output: ' + ui.labelError.text())
+        ui.logIn()
+
+        print('Test 4: any email, any password')
+        ui.lineEditUsername.setText('foobar')
+        ui.lineEditPassword.setText('helloworld')
+        print('Username: ' + ui.lineEditUsername.text())
+        print('Password: ' + ui.lineEditPassword.text())
+        print('Output: ' + ui.labelError.text())
+        ui.logIn()
+
+        print('Test 5: correct email, blank password')
+        ui.lineEditUsername.setText('lbzmercado@mymail.mapua.edu.ph')
+        ui.lineEditPassword.setText('')
+        print('Username: ' + ui.lineEditUsername.text())
+        print('Password: ' + ui.lineEditPassword.text())
+        print('Output: ' + ui.labelError.text())
+        ui.logIn()
+
+        print('Test 6: correct email, correct password')
+        ui.lineEditUsername.setText('lbzmercado@mymail.mapua.edu.ph')
+        ui.lineEditPassword.setText('2015102131')
+        print('Username: ' + ui.lineEditUsername.text())
+        print('Password: ' + ui.lineEditPassword.text())
+        print('Output: ' + ui.labelError.text())
+        ui.logIn()
+
+        LogIn.close()
