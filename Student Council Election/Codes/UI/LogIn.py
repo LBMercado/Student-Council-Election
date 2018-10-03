@@ -116,7 +116,9 @@ class Ui_LogIn(object):
         self.ui.pushButtonSignout.clicked.connect(self.reLogIn)
         
     def logIn(self):
-        datAcc = DataAccess()
+        datAcc = DataAccess(':memory:')
+        existingElecDates = datAcc.ReadElectionDates()
+        datAcc.newConnection('election_' + ''.join(str(existingElecDates[0][0].date()).split('-')) + '.db')
         inputUsername = self.lineEditUsername.text()
         inputPassword = self.lineEditPassword.text()
 
@@ -163,3 +165,12 @@ class Ui_LogIn(object):
         if self.lineEditPassword.text() == "":
             self.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Normal)
             self.lineEditPassword.setStyleSheet("color: gray")
+
+    def resetPassword(self):
+        if len(self.lineEditPassword.text()) == 0:
+            self.emptyPassword = True
+        if self.emptyPassword:
+            self.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Normal)
+            self.lineEditPassword.setStyleSheet("color: gray;")
+            self.lineEditPassword.setText('')
+            self.lineEditPassword.setCursorPosition(0)

@@ -2,10 +2,11 @@
 
 #import modules
 from datetime import datetime
+from BusinessLogic.Party import Party
 
 #Take note that startDate, endDate are of type datetime, it will raise an error if it is not followed
 class Election:
-    def __init__(self, startDate, parties):
+    def __init__(self, startDate: datetime, parties: [Party,]):
         #take note that startDate should be an object of type datetime
         if not isinstance(startDate, (datetime)):
             raise TypeError("@" + self.__str__() + ": Unexpected type of parameter startDate."

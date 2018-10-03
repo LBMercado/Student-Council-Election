@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 #import modules
+from BusinessLogic.Candidate import Candidate
 
 class Party:
     def __init__(self, partyName):
@@ -16,8 +17,8 @@ class Party:
     def GetCandidateList(self):
         return self.candidateList
 
-    def AddCandidate(self, candidate):
-        #Add candidate only if it is not a duplicate or conflicting position
+    def AddCandidate(self, candidate: Candidate):
+        #   Add candidate only if it is not a duplicate or conflicting position
         if (candidate not in self.candidateList or
                 not any(candidateInList.position == candidate.position for candidateInList in self.candidateList)):
             self.candidateList.append(candidate)
@@ -43,7 +44,7 @@ class Party:
             raise ValueError("No candidate match found in party " + "<" + self.partyName +">" + " with given position "+
                              "<" + position.__str__() + ">")
 
-    def CandidateExists(self, candidate):
+    def CandidateExists(self, candidate: Candidate):
         if (candidate in self.candidateList or
                 any(candidateInList.position == candidate.position for candidateInList in self.candidateList)):
             return True

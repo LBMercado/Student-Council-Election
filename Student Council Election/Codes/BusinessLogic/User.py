@@ -63,5 +63,8 @@ class User:
     def GetPassword(self):
         return self.password
 
-    def isAdmin(self):
-        return False
+    def IsAdmin(self):
+        if self.program == 'Administrator':
+            return True
+        else:
+            return False
