@@ -10,6 +10,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from UI.Registration import Ui_Registration
 from UI.StudentCouncilElection import Ui_StudentCouncilElection
+from UI.Admin import Ui_Admin
 from BusinessLogic.User import User
 from DataAccess.DataAccess import DataAccess
 
@@ -87,6 +88,9 @@ class Ui_LogIn(object):
         self.StudentCouncilElection = QtWidgets.QWidget()
         self.ui = Ui_StudentCouncilElection()
         self.ui.setupUi(self.StudentCouncilElection)
+        self.Admin = QtWidgets.QWidget()
+        self.uiAdmin = Ui_Admin()
+        self.uiAdmin.setupUi(self.Admin)
         self.retranslateUi(LogIn)
         
         self.lineEditPassword.setStyleSheet("color: gray")
@@ -114,39 +118,69 @@ class Ui_LogIn(object):
         self.lineEditPassword.textChanged.connect(self.inputPass)
         self.lineEditUsername.textChanged.connect(self.inputUser)
         self.ui.pushButtonSignout.clicked.connect(self.reLogIn)
+        self.uiAdmin.pushButton.clicked.connect(self.reLogInAdmin)
         
     def logIn(self):
-        datAcc = DataAccess(':memory:')
-        existingElecDates = datAcc.ReadElectionDates()
-        datAcc.newConnection('election_' + ''.join(str(existingElecDates[0][0].date()).split('-')) + '.db')
+        #   initialize the data access object to perform login checking
+        datAcc = DataAccess()
         inputUsername = self.lineEditUsername.text()
         inputPassword = self.lineEditPassword.text()
 
-        if inputUsername == "":
+        isAdmin = False
+        #   there must be an election date for it to continue
+        existingElecDates = datAcc.ReadElectionDates()
+        if (existingElecDates is None):
+            #   inform user there is no current election
             pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
-            self.labelError.setText("Please enter email.")
-        elif inputPassword == "":
-            pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
-            self.labelErrorIcon.setPixmap(pic)
-            self.labelError.setText("Please enter password.") 
-        elif datAcc.read_username(inputUsername): #email exists
-            if datAcc.read_userId(inputUsername, inputPassword): #correct matching password for email
-                self.StudentCouncilElection.show()
-                self.ui.setProfile(inputUsername, inputPassword)
+            self.labelError.setText("There is no current election in progress.")
+            #   however, admin can still login, need to check this
+            adminUser = datAcc.ReadUser('2015102131')
+            isAdmin = adminUser.GetEmail() == inputUsername and adminUser.GetPassword() == inputPassword
+            if isAdmin:
+                self.labelError.setText("Admin override.")
+                self.uiAdmin.passLoginVals(datAcc)
+                self.Admin.show()
                 self.LogIn.hide()
             else:
-                self.emptyPassword = True
-                self.resetPassword()
-                pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
-                + "\Resources\errorIcon")
-                self.labelErrorIcon.setPixmap(pic)
-                self.labelError.setText("Incorrect password.")
+                return
         else:
-            pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) 
-            + "\Resources\errorIcon")
-            self.labelErrorIcon.setPixmap(pic)
-            self.labelError.setText("Email does not exist.")
+            #   open a new connection to a database pertaining to the existing election
+            # datAcc.newConnection('election_' + ''.join(str(existingElecDates[0][0].date()).split('-')) + '.db')
+            if inputUsername == "":
+                pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
+                self.labelErrorIcon.setPixmap(pic)
+                self.labelError.setText("Please enter email.")
+            elif inputPassword == "":
+                pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
+                self.labelErrorIcon.setPixmap(pic)
+                self.labelError.setText("Please enter password.")
+            elif datAcc.read_username(inputUsername):  # email exists
+                if datAcc.read_userId(inputUsername, inputPassword):  # correct matching password for email
+                    #   must check if user is an admin
+                    adminUser = datAcc.ReadUser('2015102131')
+                    isAdmin = adminUser.GetEmail() == inputUsername and adminUser.GetPassword() == inputPassword
+                    if isAdmin:
+                        self.labelError.setText("Admin override.")
+                        self.uiAdmin.passLoginVals(datAcc)
+                        self.Admin.show()
+                        self.LogIn.hide()
+                    else:
+                        self.StudentCouncilElection.show()
+                        self.ui.setProfile(inputUsername, inputPassword)
+                        self.LogIn.hide()
+                else:
+                    self.emptyPassword = True
+                    self.resetPassword()
+                    pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir)
+                                        + "\Resources\errorIcon")
+                    self.labelErrorIcon.setPixmap(pic)
+                    self.labelError.setText("Incorrect password.")
+            else:
+                pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir)
+                                    + "\Resources\errorIcon")
+                self.labelErrorIcon.setPixmap(pic)
+                self.labelError.setText("Email does not exist.")
     def createAccount(self):
         self.Registration = QtWidgets.QWidget()
         self.ui = Ui_Registration()
@@ -174,3 +208,7 @@ class Ui_LogIn(object):
             self.lineEditPassword.setStyleSheet("color: gray;")
             self.lineEditPassword.setText('')
             self.lineEditPassword.setCursorPosition(0)
+
+    def reLogInAdmin(self):
+        self.Admin.close()
+        self.LogIn.show()

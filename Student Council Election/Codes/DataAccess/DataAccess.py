@@ -39,7 +39,7 @@ class DataAccess():
             self.dbServer.execute("SELECT COUNT(*) FROM user_info LIMIT 1")
             returnedRow = self.dbServer.fetchone()
             #   don't reinitialize user_info if it is already initialized
-            if returnedRow is None:
+            if returnedRow[0] is 0:
                 with open('Resources/user_info_complete_with_pass.csv', 'r') as openFile:
                     dataRead = csv.DictReader(openFile)
                     to_db = [(i['user_id'].replace(' ', ''), i['user_program'], i['user_firstName'], i['user_midName'],
@@ -182,18 +182,28 @@ class DataAccess():
                                       {'partyName':newParty.GetPartyName(), 'candidateId': candidate.GetUserId()})
 
     #   write new election instance into database
-    #   WARNING: THIS WILL CREATE A NEW DATABASE, MAKE SURE TO HANDLE THIS PROPERLY
+    #   WARNING: THIS WILL DROP CURRENT ELECTION TABLE, MAKE SURE TO HANDLE THIS PROPERLY
     def WriteNewElection(self, newElection: Election):
-        #   open a new database named election_<startdate>
-        self.newConnection('election_' + ''.join(str(newElection.GetStartDate().date()).split('-')) + '.db')
-
         with self.dbConnection:
+            #   drop existing table
+            self.dbServer.execute("DROP TABLE election_info")
+            self.dbServer.execute("""CREATE TABLE election_info(
+                                                                                start_date TEXT,
+                                                                                end_date TEXT
+                                                                                )
+                                                        """)
             #   insert new instance of election to database
             self.dbServer.execute("INSERT INTO election_info VALUES(:startDate,:endDate)",
                                   {'startDate':newElection.GetStartDate().date(),
                                    'endDate':newElection.GetEndDate().date()})
 
             #   load into database user_info values
+
+    #   WARNING: THIS WILL DROP CURRENT ELECTION TABLE, MAKE SURE TO HANDLE THIS PROPERLY
+    def EndElection(self):
+        with self.dbConnection:
+            #   drop existing table
+            self.dbServer.execute("DELETE FROM election_info")
 
     #   load database corresponding to startDate
     def ReadExistingElection(self, startDate: datetime):
@@ -279,6 +289,11 @@ class DataAccess():
     def ReadElectionDates(self):
         self.dbServer.execute("SELECT * FROM election_info")
         electionDetails = self.dbServer.fetchone()
+
+        #   no election started yet
+        if electionDetails is None:
+            return None
+
         startDate = datetime.strptime(electionDetails[0],"%Y-%m-%d")
         if electionDetails[1] == 'NO_END':
             endDate = None

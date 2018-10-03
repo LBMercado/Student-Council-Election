@@ -14,7 +14,8 @@ class Election:
         self.startDate = startDate
         self.endDate = None
         self.partyList = []
-        self.partyList.extend(parties)
+        if parties is not None:
+            self.partyList.extend(parties)
         self.voterList = []
         self.voteTicketList = []
 
