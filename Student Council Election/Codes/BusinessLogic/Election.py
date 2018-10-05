@@ -6,9 +6,9 @@ from BusinessLogic.Party import Party
 
 #Take note that startDate, endDate are of type datetime, it will raise an error if it is not followed
 class Election:
-    def __init__(self, startDate: datetime, parties: [Party,]):
+    def __init__(self, startDate, parties = None):
         #take note that startDate should be an object of type datetime
-        if not isinstance(startDate, (datetime)):
+        if not isinstance(startDate, (datetime)) and startDate is not None :
             raise TypeError("@" + self.__str__() + ": Unexpected type of parameter startDate."
                             + "\nType should be datetime.")
         self.startDate = startDate
@@ -19,18 +19,26 @@ class Election:
         self.voterList = []
         self.voteTicketList = []
 
+    @classmethod
+    def init_with_null(cls):
+        return cls(None, None)
+
     def GetStartDate(self):
         return self.startDate
 
     def SetEndDate(self, endDate):
-        #endDate cannot be before startDate
-        if not isinstance(endDate, (datetime)):
-            raise TypeError("@" + self.__str__() + ": Unexpected type of parameter endDate: "
-                            + "\nType should be datetime.")
-        if endDate < self.startDate:
-            raise EndDateIsBeforeStartDate("@" + self.__str__() + ": Parameter endDate cannot be before startDate.")
+        #   check if endDate is not none
+        if self.startDate is not None:
+            #   endDate cannot be before startDate
+            if not isinstance(endDate, (datetime)):
+                raise TypeError("@" + self.__str__() + ": Unexpected type of parameter endDate: "
+                                + "\nType should be datetime.")
+            if endDate < self.startDate:
+                raise EndDateIsBeforeStartDate("@" + self.__str__() + ": Parameter endDate cannot be before startDate.")
+            else:
+                self.endDate = endDate
         else:
-            self.endDate = endDate
+            raise UndefinedStartDate('Start Date has not been set.')
 
     def GetEndDate(self):
         return self.endDate
@@ -82,7 +90,11 @@ class Election:
         else:
             return voteCount
 
-#User defined exceptions for easy debugging
+#   User defined exceptions for easy debugging
 class EndDateIsBeforeStartDate(Exception):
     def __init__(self, message):
         super(EndDateIsBeforeStartDate, self).__init__(message)
+
+class UndefinedStartDate(Exception):
+    def __init__(self, message):
+        super(UndefinedStartDate, self).__init__(message)

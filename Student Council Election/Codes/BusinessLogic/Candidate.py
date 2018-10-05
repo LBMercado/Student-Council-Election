@@ -5,7 +5,7 @@ from BusinessLogic.User import User
 from BusinessLogic.Position import Position
 
 class Candidate(User):
-    def __init__(self, userId, program, firstName, middleName, lastName, password, position, party):
+    def __init__(self, userId, program, firstName, middleName, lastName, password, position, partyName):
         User.__init__(self, userId, program, firstName, middleName, lastName, password)
 
         if not isinstance(position, Position):
@@ -16,7 +16,7 @@ class Candidate(User):
         self.position = position
 
         #this is the name of the party of the candidate
-        self.party = party
+        self.partyName = partyName
 
         self.platform = "This candidate has no platform at this time."
 
@@ -27,10 +27,10 @@ class Candidate(User):
         return self.position
 
     def SetParty(self, party):
-        self.party = party
+        self.partyName = party
 
     def GetParty(self):
-        return self.party
+        return self.partyName
 
     def SetPlatform(self, platform):
         self.platform = platform

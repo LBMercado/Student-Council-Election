@@ -44,7 +44,7 @@ class DataAccess():
                     dataRead = csv.DictReader(openFile)
                     to_db = [(i['user_id'].replace(' ', ''), i['user_program'], i['user_firstName'], i['user_midName'],
                               i['user_lastName'], i['user_email'], i['user_password']) for i in dataRead]
-                to_db.pop()  # get that weird last entry off the list
+
                 self.dbServer.executemany('INSERT OR IGNORE INTO user_info VALUES(?,?,?,?,?,?,?)', to_db)
 
                 #   form the emails of the users
@@ -205,12 +205,8 @@ class DataAccess():
             #   drop existing table
             self.dbServer.execute("DELETE FROM election_info")
 
-    #   load database corresponding to startDate
-    def ReadExistingElection(self, startDate: datetime):
-        self.newConnection('election_' + ''.join(str(startDate.date()).split('-')) + '.db')
-
     #   return user if userId exists in database
-    def ReadUser(self, userId):
+    def ReadUser_with_userId(self, userId):
         self.dbServer.execute("SELECT * FROM user_info WHERE user_id = :idToFind", {'idToFind':userId})
         userDetails = self.dbServer.fetchone()
         if userDetails is not None:
@@ -221,6 +217,29 @@ class DataAccess():
         else:
             return None
 
+    def ReadUser_with_email_and_password(self, email, password):
+        self.dbServer.execute("SELECT * FROM user_info WHERE user_email = :emailToFind AND user_password = :passwordKey",
+                              {'emailToFind':email, 'passwordKey':password})
+        userDetails = self.dbServer.fetchone()
+        if userDetails is not None:
+            #   userDetails[5] is email, not needed for defining User
+            returnUser = User(int(userDetails[0]), userDetails[1], userDetails[2], userDetails[3], userDetails[4],
+                              userDetails[6])
+            return returnUser
+        else:
+            return None
+
+    #   returns true if the email exists in the database, otherwise false
+    def ReadUser_email_exists(self, email):
+        self.dbServer.execute(
+            "SELECT * FROM user_info WHERE user_email = :emailToFind", {'emailToFind': email})
+        if self.dbServer.fetchone() is None:
+            #   no email match found
+            return False
+        else:
+            #   email exists
+            return True
+
     #   return a list of User instances from database
     def ReadUsers(self):
         self.dbServer.execute("SELECT user_id FROM user_info")
@@ -229,18 +248,38 @@ class DataAccess():
             #   userDetails[5] is email, not needed for defining User
             returnUserList = []
             for fetchedId in fetchedIds:
-                returnUserList.append(self.ReadUser(fetchedId[0]))
+                returnUserList.append(self.ReadUser_with_userId(fetchedId[0]))
             return returnUserList
         else:
             return None
 
     #   return candidate if userId exists in database
-    def ReadCandidate(self, userId):
-        returnUser = self.ReadUser(userId)
+    def ReadCandidate_with_userId(self, userId):
+        returnUser = self.ReadUser_with_userId(userId)
         if returnUser is not None:
             #   get candidate details
             self.dbServer.execute("SELECT * FROM candidate_info WHERE user_id = :idToFind",
                                                      {'idToFind': userId})
+            candidateDetails = self.dbServer.fetchone()
+            #   check if user is a candidate
+            if candidateDetails is not None:
+                candidateParty = Party(candidateDetails[1])
+                returnCandidate = Candidate(returnUser.GetUserId(), returnUser.GetProgram(), returnUser.GetFirstName(),
+                                            returnUser.GetMidName(),returnUser.GetLastName(),returnUser.GetPassword(),
+                                            Position[candidateDetails[2].split('.')[1]], candidateParty)
+                returnCandidate.SetPlatform(candidateDetails[3])
+                return returnCandidate
+            else:
+                return None
+        else:
+            return None
+
+    def ReadCandidate_with_email_and_password(self, email, password):
+        returnUser = self.ReadUser_with_email_and_password(email, password)
+        if returnUser is not None:
+            #   get candidate details
+            self.dbServer.execute("SELECT * FROM candidate_info WHERE user_id = :idToFind",
+                                                     {'idToFind': returnUser.GetUserId()})
             candidateDetails = self.dbServer.fetchone()
             #   check if user is a candidate
             if candidateDetails is not None:
@@ -272,62 +311,41 @@ class DataAccess():
 
     #   return a list of candidateIds pertaining to a given party name
     def ReadPartyCandidates(self, partyName):
-        #   partyName is case-sensitive
+        #   NOTE: partyName is case-sensitive
         self.dbServer.execute("SELECT user_id FROM candidate_info WHERE candidate_party = :partyNameToFind",
                               {'partyNameToFind': partyName})
         returnCandList = []
         candidateIdReadList = self.dbServer.fetchall()
         for candidateIdRead in candidateIdReadList:
-            returnCandList.append(self.ReadCandidate(candidateIdRead))
+            returnCandList.append(self.ReadCandidate_with_userId(candidateIdRead))
 
         if len(returnCandList) == 0:
             return None
         else:
             return returnCandList
 
-    #   returns a list containing startDate and endDate
-    def ReadElectionDates(self):
-        self.dbServer.execute("SELECT * FROM election_info")
-        electionDetails = self.dbServer.fetchone()
+    #   returns a datetime instance of start date
+    def ReadElectionStartDate(self):
+        self.dbServer.execute("SELECT start_date FROM election_info")
+        electionDetail = self.dbServer.fetchone()
 
-        #   no election started yet
-        if electionDetails is None:
+        #   check if no election started yet
+        if electionDetail is None:
             return None
 
-        startDate = datetime.strptime(electionDetails[0],"%Y-%m-%d")
-        if electionDetails[1] == 'NO_END':
-            endDate = None
-        else:
-            endDate = datetime.strptime(electionDetails[1],"%Y-%m-%d")
+        startDate = datetime.strptime(electionDetail[0],"%Y-%m-%d")
 
-        return [startDate, endDate]
+        return startDate
 
-    #   returns true if details exist in database, otherwise false
-    def VerifyUser(self, email, password):
-        self.dbServer.execute("SELECT * FROM user_info WHERE user_email = :emailToFind AND user_password = :passwordToFind",
-                              {'emailToFind': email, 'passwordToFind':password})
-        if (self.dbServer.fetchone() is not None):
-            return True
-        else:
-            return False
+#   returns a datetime instance of start date
+    def ReadElectionEndDate(self):
+        self.dbServer.execute("SELECT end_date FROM election_info")
+        electionDetail = self.dbServer.fetchone()
 
-    #   returns true if user is found, otherwise returns false
-    def read_username(self, _user_email):
-        self.dbServer.execute("SELECT * FROM user_info WHERE user_email = ? ", (_user_email,))
-        if self.dbServer.fetchone() is not None:
-            return True
-        else:
-            return False
+        #   check if no not ended
+        if electionDetail is None:
+            return None
 
-    #   returns true if userid is found, otherwise returns false
-    def read_userId(self, _user_email, _user_password):
-        self.dbServer.execute("SELECT * FROM user_info WHERE user_email = ? AND user_password = ?", (_user_email, _user_password))
-        if self.dbServer.fetchone() is not None:
-            return True
-        else:
-            return False
+        startDate = datetime.strptime(electionDetail[0],"%Y-%m-%d")
 
-    #   pag palit ng password
-    def update_user(self, _user_id, _user_password):
-        with self.dbConnection:
-            self.dbServer.execute("UPDATE user_info SET user_password = ? WHERE user_id = ? ", (_user_password, _user_id,))
+        return startDate

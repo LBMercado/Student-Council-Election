@@ -7,9 +7,22 @@ class User:
     def __init__(self, userId, program, firstName, middleName, lastName, password = None):
         self.userId = userId
         self.program = program
-        self.firstName = firstName.lower()
-        self.middleName = middleName.lower()
-        self.lastName = lastName.lower()
+
+        if firstName is not None and middleName is not None and lastName is not None:
+            self.firstName = firstName.upper()
+            self.middleName = middleName.upper()
+            self.lastName = lastName.upper()
+
+            # assume first name is separated by spaces, split into a list
+            firstNameList = self.firstName.split()
+            # auto-generate an email address based on firstName, middleName, and lastName
+            emailConverter = NameToEmail(firstNameList, self.middleName, self.lastName)
+            emailConverter.ConvertNameToEmail()
+            self.email = emailConverter.GetEmail()
+        else:
+            self.firstName = firstName
+            self.middleName = middleName
+            self.lastName = lastName
 
         #If no supplied password, default password is userId
         if password is None:
@@ -17,12 +30,24 @@ class User:
         else:
             self.password = password
 
-        # assume first name is separated by spaces, split into a list
-        firstNameList = self.firstName.split()
-        # auto-generate an email address based on firstName, middleName, and lastName
-        emailConverter = NameToEmail(firstNameList, self.middleName, self.lastName)
-        emailConverter.ConvertNameToEmail()
-        self.email = emailConverter.GetEmail()
+    @classmethod
+    def init_with_email_and_password(cls, email, password):
+        userId = None
+        program = None
+        firstName = None
+        middleName = None
+        lastName = None
+        cls.email = email
+        return cls(userId, program, firstName, middleName, lastName, password)
+
+    def init_with_null(cls):
+        cls.userId = None
+        cls.program = None
+        cls.firstName = None
+        cls.middleName = None
+        cls.lastName = None
+        cls.email = None
+        cls.password = None
 
     def GetUserId(self):
         return self.userId
@@ -62,9 +87,3 @@ class User:
 
     def GetPassword(self):
         return self.password
-
-    def IsAdmin(self):
-        if self.program == 'Administrator':
-            return True
-        else:
-            return False
