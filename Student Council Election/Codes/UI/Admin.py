@@ -13,6 +13,7 @@ from BusinessLogic.Election import Election
 
 class Ui_Admin(object):
     def setupUi(self, Admin):
+        self.datAccess = DataAccess()
         Admin.setObjectName("Admin")
         Admin.setFixedSize(1000, 600)
         self.pushButtonCreateUser = QtWidgets.QPushButton(Admin)
@@ -394,14 +395,14 @@ class Ui_Admin(object):
         newElection = Election(elecStartDate, None)
         newElection.SetEndDate(electEndDate)
 
-        self.datAcess.WriteNewElection(newElection)
+        self.datAccess.WriteNewElection(newElection)
 
     def endElec(self):
         self.labelElectionStatus.setText("<html><head/><body><p><span style=\" font-size:26pt;\">ELECTION ENDED</span></p></body></html>")
-        self.datAcess.EndElection()
+        self.datAccess.EndElection()
 
-    def passLoginVals(self, dataAccess: DataAccess):
-        self.datAcess = dataAccess
+    def passLoginVals(self, user):
+        self.user = user
 
 if __name__ == "__main__":
     import sys

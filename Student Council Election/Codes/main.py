@@ -1,15 +1,14 @@
-#!/usr/bin/env python
+#   !/usr/bin/env python
 
-#import modules
-from BusinessLogic.testCase import TestCases
+#   import modules
+from BusinessLogic.testCase import TestCase
 from UI.LogIn import Ui_LogIn
 from PyQt5 import QtWidgets
 import unittest
-import sys, os
-from DataAccess.DataAccess import DataAccess
+import sys
 
 if __name__ == "__main__":
-    # suite = unittest.TestLoader().loadTestsFromTestCase(TestCases)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestCase)
     unittest.TextTestRunner(verbosity=2).run(suite)
 
     #   main program

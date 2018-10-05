@@ -6,17 +6,18 @@
 #
 # WARNING! All changes made in this file will be lost!
 import os
-import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from UI.Registration import Ui_Registration
 from UI.StudentCouncilElection import Ui_StudentCouncilElection
 from UI.Admin import Ui_Admin
-from BusinessLogic.User import User
-from DataAccess.DataAccess import DataAccess
+from BusinessLogic.UserInterface import UserInterface
+from BusinessLogic.ElectionInterface import ElectionInterface
 
 class Ui_LogIn(object):
     def setupUi(self, LogIn):
         self.LogIn = LogIn
+        self.userInterface = UserInterface()
+        self.election = ElectionInterface()
         LogIn.setObjectName("LogIn")
         LogIn.setFixedSize(630, 507)
 #        LogIn.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -121,28 +122,23 @@ class Ui_LogIn(object):
         self.uiAdmin.pushButton.clicked.connect(self.reLogInAdmin)
         
     def logIn(self):
-        #   initialize the data access object to perform login checking
-        datAcc = DataAccess()
         inputUsername = self.lineEditUsername.text()
         inputPassword = self.lineEditPassword.text()
-
-        isAdmin = False
+        self.userInterface.set_user_email_and_password(inputUsername, inputPassword)
         #   there must be an election date for it to continue
-        existingElecDates = datAcc.ReadElectionDates()
-        if (existingElecDates is None):
+        if (not self.election.CheckElection()):
             #   inform user there is no current election
             pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
-            self.labelError.setText("There is no current election in progress.")
             #   however, admin can still login, need to check this
-            adminUser = datAcc.ReadUser('2015102131')
-            isAdmin = adminUser.GetEmail() == inputUsername and adminUser.GetPassword() == inputPassword
-            if isAdmin:
+            user = self.userInterface.GetUser()
+            if self.userInterface.is_Admin():
                 self.labelError.setText("Admin override.")
-                self.uiAdmin.passLoginVals(datAcc)
+                self.uiAdmin.passLoginVals(user)
                 self.Admin.show()
                 self.LogIn.hide()
             else:
+                self.labelError.setText("There is no current election in progress.")
                 return
         else:
             #   open a new connection to a database pertaining to the existing election
@@ -155,14 +151,13 @@ class Ui_LogIn(object):
                 pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)
                 self.labelError.setText("Please enter password.")
-            elif datAcc.read_username(inputUsername):  # email exists
-                if datAcc.read_userId(inputUsername, inputPassword):  # correct matching password for email
+            elif self.userInterface.user_email_is_valid():  # email exists
+                if self.userInterface.is_User():  # correct matching password for email
                     #   must check if user is an admin
-                    adminUser = datAcc.ReadUser('2015102131')
-                    isAdmin = adminUser.GetEmail() == inputUsername and adminUser.GetPassword() == inputPassword
-                    if isAdmin:
+                    if self.userInterface.is_Admin():
+                        user = self.userInterface.GetUser()
                         self.labelError.setText("Admin override.")
-                        self.uiAdmin.passLoginVals(datAcc)
+                        self.uiAdmin.passLoginVals(user)
                         self.Admin.show()
                         self.LogIn.hide()
                     else:
