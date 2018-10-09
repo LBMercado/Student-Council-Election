@@ -3,14 +3,16 @@
 #import modules
 from datetime import datetime
 from BusinessLogic.Party import Party
+from DataAccess.DataAccess import DataAccess
 
 #Take note that startDate, endDate are of type datetime, it will raise an error if it is not followed
 class Election:
     def __init__(self, startDate, parties = None):
-        #take note that startDate should be an object of type datetime
+        #   take note that startDate should be an object of type datetime
         if not isinstance(startDate, (datetime)) and startDate is not None :
             raise TypeError("@" + self.__str__() + ": Unexpected type of parameter startDate."
                             + "\nType should be datetime.")
+        self.data = DataAccess()
         self.startDate = startDate
         self.endDate = None
         self.partyList = []
@@ -22,6 +24,37 @@ class Election:
     @classmethod
     def init_with_null(cls):
         return cls(None, None)
+
+    @classmethod
+    def init_with_startAndEndDate(cls, startDate, endDate):
+        cls(startDate, None)
+        cls.SetEndDate(endDate)
+        return cls
+
+    #   return true if election table is filled, otherwise false
+    @staticmethod
+    def ElectionExists():
+        data = DataAccess()
+        if data.ReadElectionStartDate() is not None:
+            return True
+        else:
+            return False
+
+    #   return existing election start date, if it exists
+    @staticmethod
+    def GetExistingElectionStartDate():
+        data = DataAccess()
+        return data.ReadElectionStartDate()
+
+    @staticmethod
+    def GetExistingElectionEndDate():
+        data = DataAccess()
+        return data.ReadElectionEndDate()
+
+    @staticmethod
+    def DropExistingElection():
+        data = DataAccess()
+        data.EndElection()
 
     def GetStartDate(self):
         return self.startDate
@@ -39,6 +72,11 @@ class Election:
                 self.endDate = endDate
         else:
             raise UndefinedStartDate('Start Date has not been set.')
+
+    #   write start and end election to database
+    def StartElection(self):
+        if self.startDate is not None and self.endDate is not None:
+            self.data.WriteNewElection(self.startDate, self.endDate)
 
     def GetEndDate(self):
         return self.endDate

@@ -11,13 +11,13 @@ from UI.Registration import Ui_Registration
 from UI.StudentCouncilElection import Ui_StudentCouncilElection
 from UI.Admin import Ui_Admin
 from BusinessLogic.UserInterface import UserInterface
-from BusinessLogic.ElectionInterface import ElectionInterface
+from BusinessLogic.Election import Election
 
 class Ui_LogIn(object):
     def setupUi(self, LogIn):
         self.LogIn = LogIn
         self.userInterface = UserInterface()
-        self.election = ElectionInterface()
+        self.election = None
         LogIn.setObjectName("LogIn")
         LogIn.setFixedSize(630, 507)
 #        LogIn.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -126,13 +126,13 @@ class Ui_LogIn(object):
         inputPassword = self.lineEditPassword.text()
         self.userInterface.set_user_email_and_password(inputUsername, inputPassword)
         #   there must be an election date for it to continue
-        if (not self.election.CheckElection()):
+        if (not Election.ElectionExists()):
             #   inform user there is no current election
             pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             #   however, admin can still login, need to check this
             user = self.userInterface.GetUser()
-            if self.userInterface.is_Admin():
+            if self.userInterface.is_User() and self.userInterface.is_Admin():
                 self.labelError.setText("Admin override.")
                 self.uiAdmin.passLoginVals(user)
                 self.Admin.show()
@@ -141,8 +141,9 @@ class Ui_LogIn(object):
                 self.labelError.setText("There is no current election in progress.")
                 return
         else:
-            #   open a new connection to a database pertaining to the existing election
-            # datAcc.newConnection('election_' + ''.join(str(existingElecDates[0][0].date()).split('-')) + '.db')
+            # an election exists, load an instance of the election from the database
+            self.election = Election.init_with_startAndEndDate(Election.GetExistingElectionStartDate(),
+                                                               Election.GetExistingElectionEndDate())
             if inputUsername == "":
                 pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)

@@ -3,11 +3,9 @@
 #   import modules
 import sqlite3
 from BusinessLogic.User import User
-from BusinessLogic.NameToEmail import NameToEmail
 from BusinessLogic.Candidate import Candidate
 from BusinessLogic.Party import Party
 from BusinessLogic.Position import Position
-from BusinessLogic.Election import Election
 from BusinessLogic.VoteTicket import VoterTicket
 from datetime import datetime
 import csv
@@ -173,37 +171,21 @@ class DataAccess():
                 (newVoteTicket.GetVoterId(), newVoteTicket.GetCandidateId())
                                 )
 
-    #   write party candidates into database
-    def WritePartyCandidates(self, newParty: Party):
-        with self.dbConnection:
-            #   Add all candidates of the party to the new table
-            for candidate in newParty.GetCandidateList():
-                self.dbServer.execute("INSERT OR IGNORE INTO :partyName VALUES(:candidateId)",
-                                      {'partyName':newParty.GetPartyName(), 'candidateId': candidate.GetUserId()})
-
-    #   write new election instance into database
-    #   WARNING: THIS WILL DROP CURRENT ELECTION TABLE, MAKE SURE TO HANDLE THIS PROPERLY
-    def WriteNewElection(self, newElection: Election):
-        with self.dbConnection:
-            #   drop existing table
-            self.dbServer.execute("DROP TABLE election_info")
-            self.dbServer.execute("""CREATE TABLE election_info(
-                                                                                start_date TEXT,
-                                                                                end_date TEXT
-                                                                                )
-                                                        """)
-            #   insert new instance of election to database
-            self.dbServer.execute("INSERT INTO election_info VALUES(:startDate,:endDate)",
-                                  {'startDate':newElection.GetStartDate().date(),
-                                   'endDate':newElection.GetEndDate().date()})
-
-            #   load into database user_info values
-
     #   WARNING: THIS WILL DROP CURRENT ELECTION TABLE, MAKE SURE TO HANDLE THIS PROPERLY
     def EndElection(self):
         with self.dbConnection:
             #   drop existing table
             self.dbServer.execute("DELETE FROM election_info")
+
+    #   write a start date for the election in the election_info table in the database
+    def WriteNewElection(self, newStartDate: datetime, newEndDate: datetime):
+        with self.dbConnection:
+            #   insert only if election table is empty
+            self.dbServer.execute("SELECT COUNT(start_date) FROM election_info")
+            if (self.dbServer.fetchone()[0] == 0):
+                self.dbServer.execute("INSERT OR REPLACE INTO election_info VALUES(:newStartDate, :newEndDate)",
+                                      {'newStartDate':newStartDate.date().strftime("%Y-%m-%d"),
+                                       'newEndDate':newEndDate.date().strftime("%Y-%m-%d")})
 
     #   return user if userId exists in database
     def ReadUser_with_userId(self, userId):

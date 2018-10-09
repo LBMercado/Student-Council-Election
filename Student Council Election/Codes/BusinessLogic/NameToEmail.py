@@ -32,25 +32,26 @@ class NameToEmail:
 		#3. the email format @mymail.mapua.edu.ph should follow after (2)
 		letterSet = ''
 
-		#	there will always be a first name
-		letterSet += self.firstNameList[0][0]
-		nameList = self.firstNameList
+		#	check if there is a first name, if none, only append the lastname
+		if len(self.firstNameList) != 0:
+			letterSet += self.firstNameList[0][0]
+			nameList = self.firstNameList
 
-		#	this first name will be used for the additionalChars algorithm, so remove it
-		nameList.remove(self.firstNameList[0])
+			#	this first name will be used for the additionalChars algorithm, so remove it
+			nameList.remove(self.firstNameList[0])
 
-		if len(self.middleName) != 0:
-			nameList.append(self.middleName)
+			if len(self.middleName) != 0:
+				nameList.append(self.middleName)
 
-		firstNameIndex = 1
+			firstNameIndex = 1
 
-		while (additionalChars > 0 and firstNameIndex <= len(self.firstNameList[0]) - 1):
-			letterSet += self.firstNameList[0][firstNameIndex]
-			firstNameIndex += 1
-			additionalChars -= 1
+			while (additionalChars > 0 and firstNameIndex <= len(self.firstNameList[0]) - 1):
+				letterSet += self.firstNameList[0][firstNameIndex]
+				firstNameIndex += 1
+				additionalChars -= 1
 
-		for name in nameList:
-			letterSet += name[0]
+			for name in nameList:
+				letterSet += name[0]
 
 		#form the email
 		self.email = letterSet + self.lastName + '@mymail.mapua.edu.ph'

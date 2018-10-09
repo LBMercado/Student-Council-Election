@@ -7,13 +7,14 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import os, datetime
-from DataAccess.DataAccess import DataAccess
+import os
 from BusinessLogic.Election import Election
+from datetime import datetime, timedelta
 
 class Ui_Admin(object):
     def setupUi(self, Admin):
-        self.datAccess = DataAccess()
+        self.election_duration = 10 #   set in program
+
         Admin.setObjectName("Admin")
         Admin.setFixedSize(1000, 600)
         self.pushButtonCreateUser = QtWidgets.QPushButton(Admin)
@@ -390,16 +391,16 @@ class Ui_Admin(object):
         print("SEARCH STUDENT NUMBER FROM EDIT")
     def startElec(self):
         self.labelElectionStatus.setText("<html><head/><body><p><span style=\" font-size:26pt;\">ELECTION ON GOING</span></p></body></html>")
-        elecStartDate = datetime.datetime.now()
-        electEndDate = datetime.datetime(2018,10,13)
+        elecStartDate = datetime.now()
+        electEndDate = elecStartDate + timedelta(days=self.election_duration)
         newElection = Election(elecStartDate, None)
         newElection.SetEndDate(electEndDate)
 
-        self.datAccess.WriteNewElection(newElection)
+        newElection.StartElection()
 
     def endElec(self):
         self.labelElectionStatus.setText("<html><head/><body><p><span style=\" font-size:26pt;\">ELECTION ENDED</span></p></body></html>")
-        self.datAccess.EndElection()
+        Election.DropExistingElection()
 
     def passLoginVals(self, user):
         self.user = user

@@ -8,8 +8,8 @@ import unittest
 import sys
 
 if __name__ == "__main__":
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestCase)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    # suite = unittest.TestLoader().loadTestsFromTestCase(TestCase)
+    # unittest.TextTestRunner(verbosity=2).run(suite)
 
     #   main program
     app = QtWidgets.QApplication(sys.argv)
