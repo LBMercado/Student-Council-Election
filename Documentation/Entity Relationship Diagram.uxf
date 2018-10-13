@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>190</x>
+      <y>180</y>
+      <w>210</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>candidate_info
+--
+user_name
+candidate_party
+candidate_position
+candidate_platform
+candidate_path</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>410</y>
+      <w>210</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>election_info
+--
+start_date
+end_date
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>190</x>
+      <y>410</y>
+      <w>210</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>user_info
+--
+user_id
+user_program
+user_firstName
+user_midName
+user_lastName
+user_email
+user_password
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>670</x>
+      <y>180</y>
+      <w>210</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>vote_ticket
+--
+user_id
+vote_president
+vote_internal_vp
+vote_external_vp
+vote_2nd_yr
+vote_3rd_yr
+vote_4th_yr
+vote_business_manager
+vote_csc
+vote_executive_secretary
+vote_general_engineering
+vote_secretary_of_amusement
+vote_secretary_of_audit
+vote_secretary_of_finance
+vote_secretary_of_information
+vote_secretary_of_logistics
+vote_secretary_of_scholarship
+vote_secretary_of_welfare
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>100</y>
+      <w>520</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>500.0;80.0;500.0;10.0;10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>280</y>
+      <w>30</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;130.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>520</x>
+      <y>100</y>
+      <w>30</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes>10.0;10.0;10.0;310.0</additional_attributes>
+  </element>
+</diagram>
