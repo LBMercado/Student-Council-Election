@@ -3,6 +3,9 @@
 #   import modules
 from DataAccess.DataAccess import DataAccess
 from BusinessLogic.User import User
+from BusinessLogic.Candidate import Candidate
+from BusinessLogic.Voter import Voter
+from BusinessLogic.Admin import Admin
 
 #   this class links the data access layer with the user interface of the application
 class UserInterface():
@@ -34,7 +37,11 @@ class UserInterface():
             returnedUser = self.data.ReadUser_with_email_and_password(self.user.GetEmail(), self.user.GetPassword())
             if returnedUser is not None:
                 self.user = returnedUser
-                return self.user.program.upper() == 'ADMINISTRATOR'
+                if self.user.program.upper() == 'ADMINISTRATOR':
+                    self.user = Admin.morph_user_to_admin(self.user)
+                    return True
+                else:
+                    return False
             else:
                 raise UserNotFound('User was not found in the database. '
                                    'Try to call the \"is_User\" function first before calling this one.')
@@ -54,6 +61,21 @@ class UserInterface():
             else:
                 return False
 
+    #   return true if candidate, otherwise return false
+    def is_Voter(self):
+        if self.user is None:
+            raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
+        if not self.is_Candidate() or not self.is_Admin():
+            self.user = Voter.morph_user_to_voter(self.user)
+            return True
+        else:
+            return False
+
+    #   loads the vote tickets provided set User is only a User
+    def load_vote_tickets(self):
+        if (not self.is_Candidate() or not self.is_Admin()):
+            pass
+
     def user_email_is_valid(self):
         if self.user is None:
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
@@ -66,6 +88,14 @@ class UserInterface():
 
     def GetUser(self):
         return self.user
+
+    #   updates user password from database
+    def UpdateUser(self):
+        if self.user is None:
+            raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
+        else:
+            #   look into database and find if user exists
+            self.data.UpdateUser(self.user)
 
 #
 #   User defined exceptions for easy debugging

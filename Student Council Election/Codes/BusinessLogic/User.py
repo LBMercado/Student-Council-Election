@@ -40,14 +40,25 @@ class User:
         cls.email = email
         return cls(userId, program, firstName, middleName, lastName, password)
 
+    @classmethod
+    def init_with_userId(cls, userId):
+        userId = userId
+        program = None
+        firstName = None
+        middleName = None
+        lastName = None
+        password = None
+        return cls(userId, program, firstName, middleName, lastName, password)
+
+    @classmethod
     def init_with_null(cls):
-        cls.userId = None
-        cls.program = None
-        cls.firstName = None
-        cls.middleName = None
-        cls.lastName = None
-        cls.email = None
-        cls.password = None
+        userId = None
+        program = None
+        firstName = None
+        middleName = None
+        lastName = None
+        password = None
+        return cls(userId, program, firstName, middleName, lastName, password)
 
     def GetUserId(self):
         return self.userId

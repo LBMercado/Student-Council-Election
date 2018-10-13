@@ -9,11 +9,17 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import os
 from BusinessLogic.Election import Election
+from BusinessLogic.AdminInterface import AdminInterface
+from BusinessLogic.Admin import Admin
 from datetime import datetime, timedelta
 
 class Ui_Admin(object):
     def setupUi(self, Admin):
+        #   custom variables
         self.election_duration = 10 #   set in program
+        self.projDirectory = os.getcwd()
+        self.user = None
+        self.adminInterface = None
 
         Admin.setObjectName("Admin")
         Admin.setFixedSize(1000, 600)
@@ -220,14 +226,13 @@ class Ui_Admin(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout_2)
         self.horizontalLayout_4.addLayout(self.verticalLayout_4)
         self.scrollAreaSumm.setWidget(self.scrollAreaWidgetContents_5)
-        
-        projDirectory = os.path.normpath(os.getcwd() + os.sep + os.pardir) + '\PyCharm_Project_Env'
-        projDirectory = projDirectory.replace("\\", "/")
+
+        projDirectory = self.projDirectory.replace("\\", "/")
         background = ("QWidget#Admin{background-image: url(\""+projDirectory
                             +"/Resources/LogInBackground.jpg\"); background-position: center;}")
-        Admin.setStyleSheet(background + open(projDirectory
+        Admin.setStyleSheet(background + open(self.projDirectory
                             + "\Resources\Design.qss",'r').read())
-        Admin.setWindowIcon(QtGui.QIcon(projDirectory
+        Admin.setWindowIcon(QtGui.QIcon(self.projDirectory
                             + "\Resources\MapuaIcon.png"))      
         font.setPointSize(14)
         self.pushButtonCreateUser.setFont(font)
@@ -292,7 +297,14 @@ class Ui_Admin(object):
         self.pushButtonSearchEdit.setText(_translate("Admin", "Search"))
         self.label_2.setText(_translate("Admin", "<html><head/><body><p><span style=\" font-size:10pt;\">Name: </span></p><p><span style=\" font-size:10pt;\">Student Number: </span></p><p><span style=\" font-size:10pt;\">Email:</span></p></body></html>"))
         self.pushButtonEdit.setText(_translate("Admin", "Edit"))
-        self.labelElectionStatus.setText(_translate("Admin", "<html><head/><body><p><span style=\" font-size:26pt;\">ELECTION ON GOING</span></p></body></html>"))
+
+        #   check if an election is on going, set proper labels
+        if (Election.GetExistingElectionStartDate() is None):
+            self.labelElectionStatus.setText(_translate("Admin",
+                                                        "<html><head/><body><p><span style=\" font-size:26pt;\">NO ELECTION STARTED YET</span></p></body></html>"))
+        else:
+            self.labelElectionStatus.setText(_translate("Admin", "<html><head/><body><p><span style=\" font-size:26pt;\">ELECTION ON GOING</span></p></body></html>"))
+
         self.label.setText(_translate("Admin", "TextLabel"))
         self.label_3.setText(_translate("Admin", "<html><head/><body><p>Candidate 1</p><p>Vote:</p></body></html>"))
         self.label_4.setText(_translate("Admin", "TextLabel"))
@@ -378,17 +390,123 @@ class Ui_Admin(object):
         if self.lineEditReenterPass.text() == "":
             self.lineEditReenterPass.setEchoMode(QtWidgets.QLineEdit.Normal)
             self.lineEditReenterPass.setStyleSheet("color: gray")
-    
+
+    #   DELETE EXISTING USER
     def delete(self):
-        print("DELETE EXISTING USER")
+        if (self.adminInterface.is_User()):
+
+            if (self.adminInterface.is_user_admin()):
+                failMsg = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Information,
+                                                   'Attempt to Delete Admin',
+                                                   'You cannot delete an admin.',
+                                                   QtWidgets.QMessageBox.Ok)
+                failMsg.exec()
+                self.adminInterface.reset_user()
+                return
+
+            #   ask for confirmation of deletion since this is will permanently lose the data
+            #   distinguish between Candidate and User
+            response = None
+            if (self.adminInterface.is_Candidate()):
+                confirmMsg = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Information,
+                                                   'Delete User?',
+                                                   'This is not reversible, are you sure you want to delete this user?',
+                                                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                confirmMsg.setInformativeText('This user has been detected to be also a candidate.')
+                response = confirmMsg.exec()
+            else:
+                confirmMsg = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Information,
+                                                   'Delete User?',
+                                                   'This is not reversible, are you sure you want to delete this user?',
+                                                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                response = confirmMsg.exec()
+            if response == QtWidgets.QMessageBox.Yes:
+                self.adminInterface.remove_user()
+                self.adminInterface.reset_user()
+                self.labelDelProfile.setText(
+                    "<html><head/><body><p>"
+                    "<span style=\" font-size:20pt;\">"
+                    "Name: "
+                    "</span>"
+                    "</p>"
+                    "<p>"
+                    "<span style=\" font-size:20pt;\">"
+                    "Student Number: "
+                    "</span>"
+                    "</p>"
+                    "<p>"
+                    "<span style=\" font-size:20pt;\">"
+                    "Email: "
+                    "</span>"
+                    "</p>"
+                    "</body>"
+                    "</html>")
+                successMsg = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Information,
+                                               'User Deleted',
+                                               'User successfully removed from database.',
+                                               QtWidgets.QMessageBox.Ok)
+                successMsg.show()
+
+    #   EDIT EXISTING USER
     def edit(self):
-        print("EDIT EXISTING USER")
+        pass
+
+    #   CREATE THE NEW USER PROFILE
     def create(self):
-        print("CREATE THE NEW USER PROFILE")
+        pass
+
+    #   SEARCH STUDENT NUMBER FROM DELETE
     def searchDelete(self):
-        print("SEARCH STUDENT NUMBER FROM DELETE")
+        #   reset the current set user in AdminInterface first to prevent unexpected outputs
+        self.adminInterface.reset_user()
+        studId = self.lineEditSearch.text()
+        try:
+            studId = int(studId)
+            self.adminInterface.set_user_userId(studId)
+
+            if (self.adminInterface.is_User()):
+                #   display in labels the user information
+                user = self.adminInterface.GetUser()
+                self.labelDelProfile.setText(
+                    "<html><head/><body><p>"
+                    "<span style=\" font-size:20pt;\">"
+                    "Name: " + user.GetLastName() + ", " + user.GetFirstName() + " " + user.GetMidName() +
+                    "</span>"
+                    "</p>"
+                    "<p>"
+                    "<span style=\" font-size:20pt;\">"
+                    "Student Number: " + (str)(user.GetUserId()) +
+                    "</span>"
+                    "</p>"
+                    "<p>"
+                    "<span style=\" font-size:20pt;\">"
+                    "Email: " + user.GetEmail() +
+                    "</span>"
+                    "</p>"
+                    "</body>"
+                    "</html>")
+            else:
+                notFoundMsg = QtWidgets.QMessageBox()
+                notFoundMsg.setIcon(QtWidgets.QMessageBox.Information)
+                notFoundMsg.setText('User not found.')
+                notFoundMsg.setWindowTitle('Search User')
+                notFoundMsg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
+                notFoundMsg.exec()
+
+        except ValueError:
+            errorMsg = QtWidgets.QMessageBox()
+            errorMsg.setIcon(QtWidgets.QMessageBox.Information)
+            errorMsg.setText('Incorrect student number inputted.')
+            errorMsg.setWindowTitle('Input Error')
+            errorMsg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
+            errorMsg.exec()
+
+    #   SEARCH STUDENT NUMBER FROM EDIT
     def searchEdit(self):
-        print("SEARCH STUDENT NUMBER FROM EDIT")
+        pass
+
     def startElec(self):
         self.labelElectionStatus.setText("<html><head/><body><p><span style=\" font-size:26pt;\">ELECTION ON GOING</span></p></body></html>")
         elecStartDate = datetime.now()
@@ -402,8 +520,9 @@ class Ui_Admin(object):
         self.labelElectionStatus.setText("<html><head/><body><p><span style=\" font-size:26pt;\">ELECTION ENDED</span></p></body></html>")
         Election.DropExistingElection()
 
-    def passLoginVals(self, user):
-        self.user = user
+    def PassAdminInfo(self, admin: Admin):
+        self.user = admin
+        self.adminInterface = AdminInterface(admin)
 
 if __name__ == "__main__":
     import sys

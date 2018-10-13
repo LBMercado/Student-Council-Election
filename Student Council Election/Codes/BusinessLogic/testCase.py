@@ -1,7 +1,7 @@
 from BusinessLogic.Candidate import Candidate
 from BusinessLogic.Position import Position
 from BusinessLogic.Party import Party
-from BusinessLogic.VoteTicket import VoterTicket
+from BusinessLogic.VoteTicket import VoteTicket
 from BusinessLogic.Election import Election
 from BusinessLogic.UserInterface import UserInterface
 from UI.LogIn import Ui_LogIn
@@ -40,6 +40,21 @@ class TestCase(unittest.TestCase):
         ui = UserInterface()
         ui.set_user_email_and_password('lbzmercado@mymail.mapua.edu.ph', '2015102131')
         self.assertTrue(ui.is_User())
+
+    def test_election_write_candidate(self):
+        dat = DataAccess()
+        cand = Candidate(2015102131, 'CPE', 'Luis Benjamin', 'Zarate', 'Mercado', '2015102131',
+                                   Position.PRESIDENT, "SAGIP")
+        dat.WriteCandidate(cand)
+        cand = dat.ReadAllPartyCandidates("SAGIP")
+
+    def test_election_init(self):
+        dat = DataAccess()
+        cand = Candidate(2015102131, 'CPE', 'Luis Benjamin', 'Zarate', 'Mercado', '2015102131',
+                         Position.PRESIDENT, "SAGIP")
+        dat.WriteCandidate(cand)
+        elect = Election(Election.GetExistingElectionStartDate())
+
     #   Business Logic Test 1
     # def testCase1(self):
     #     indepPart = 'Independent'

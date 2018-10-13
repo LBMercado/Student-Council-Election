@@ -7,6 +7,9 @@
 # WARNING! All changes made in this file will be lost!
 import os
 from PyQt5 import QtCore, QtGui, QtWidgets
+from BusinessLogic.Election import Election
+from BusinessLogic.Position import Position
+from BusinessLogic.UserInterface import UserInterface
 
 class Ui_StudentCouncilElection(object):
     def setupUi(self, StudentCouncilElection):
@@ -282,6 +285,15 @@ class Ui_StudentCouncilElection(object):
             self.labelPosition.setText("FINANCE")
     def setProfile(self, fullName, email):
         self.labelProfile.setText(fullName + "\n" + email)
+
+    def pass_user_interface(self, userInterface: UserInterface):
+        self.userInterface = userInterface
+        #   set user as a voter
+        self.userInterface.is_Voter()
+
+    def init_election_interface(self):
+        self.electionInterface = Election.init_with_startAndEndDate(Election.GetExistingElectionStartDate(),
+                                          Election.GetExistingElectionEndDate())
 
 if __name__ == "__main__":
     import sys
