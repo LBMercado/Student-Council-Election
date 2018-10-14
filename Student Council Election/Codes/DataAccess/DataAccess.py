@@ -19,6 +19,8 @@ class DataAccess():
             self.dbPath = dbName
         else:
             self.dbPath = 'Database/' + dbName
+
+        #   start the connection
         self.dbConnection = sqlite3.connect(self.dbPath)
         self.dbServer = self.dbConnection.cursor()
 
@@ -100,12 +102,9 @@ class DataAccess():
                                                             )
                                     """)
 
-    def __del__(self):
-        self.dbConnection.close()
-
     #   starts a new database connection
     def newConnection(self, dbName):
-        #   close existing connection
+        #   close the existing connection
         self.dbConnection.close()
 
         if dbName == ':memory:':
@@ -268,6 +267,16 @@ class DataAccess():
                     newUser.GetPassword())
                 )
 
+    #   write/replace general class User: Voter, Candidate, Admin
+    def WriteOrUpdateUser(self, newUser: User):
+        with self.dbConnection:
+            self.dbServer.execute(
+                "REPLACE INTO user_info VALUES(?,?,?,?,?,?,?)",
+                (newUser.GetUserId(), newUser.GetProgram(), newUser.GetFirstName(),
+                    newUser.GetMidName(), newUser.GetLastName(), newUser.GetEmail(),
+                    newUser.GetPassword())
+                )
+
     #   update general class User: Voter, Candidate, Admin
     def UpdateUser(self, existingUser: User):
         with self.dbConnection:
@@ -407,7 +416,7 @@ class DataAccess():
             #   skip the first element, it has already been used
             for candId in voteTickDetails[1:]:
                 candRead = self.ReadCandidate_with_userId(candId)
-                returnVoteTicket.SetPositionWithCandidateId(candRead.GetPosition(), candId)
+                returnVoteTicket.SetVote(candRead.GetPosition(), candId)
 
             return returnVoteTicket
         else:
@@ -425,7 +434,7 @@ class DataAccess():
                 #   skip the first element, it has already been used
                 for candId in voteTickDetails[1:]:
                     candRead = self.ReadCandidate_with_userId(candId)
-                    returnVoteTicket.SetPositionWithCandidateId(candRead.GetPosition(), candId)
+                    returnVoteTicket.SetVote(candRead.GetPosition(), candId)
                 returnTickets.append(returnVoteTicket)
             return returnTickets
         else:
@@ -456,8 +465,13 @@ class DataAccess():
     #   BUSINESS_MANAGER                  = 17
     def WriteVoteTicket(self, voterId, voteDict: dict):
         with self.dbConnection:
+            #   convert none types to string
+            for key in voteDict.keys():
+                if voteDict[key] is None:
+                    voteDict[key] = ''
+
             self.dbServer.execute("""REPLACE INTO vote_ticket VALUES(
-                                                        :voter_id
+                                                        :voterId,
                                                         :REPRESENTATIVE_CSC,
                                                         :PRESIDENT,
                                                         :VICE_PRESIDENT_INT, 
@@ -470,7 +484,7 @@ class DataAccess():
                                                         :SECRETARY_SCHOLARSHIP, 
                                                         :SECRETARY_INFO_CORRESPONDENCE,  
                                                         :SECRETARY_AMUSEMENT_RECREATION, 
-                                                        :SECRETARY_WELFARE_DEV,  
+                                                        :SECRETARY_WELFARE_DEV,
                                                         :REPRESENTATIVE_4TH_YEAR, 
                                                         :REPRESENTATIVE_3RD_YEAR, 
                                                         :REPRESENTATIVE_2ND_YEAR,
@@ -580,3 +594,12 @@ class DataAccess():
                 self.dbServer.execute("INSERT OR REPLACE INTO election_info VALUES(:newStartDate, :newEndDate)",
                                         {'newStartDate': newStartDate.date().strftime("%Y-%m-%d"),
                                         'newEndDate': newEndDate.date().strftime("%Y-%m-%d")})
+
+    #   closes the current connection
+    def CloseCurrentConnection(self):
+        self.dbConnection.close()
+
+    #   reopens the connection to the database specified by the dbPath
+    def ReopenConnection(self):
+        self.dbConnection = sqlite3.connect(self.dbPath)
+        self.dbServer = self.dbConnection.cursor()

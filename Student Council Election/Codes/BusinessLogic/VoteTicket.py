@@ -14,8 +14,11 @@ class VoteTicket:
     def GetVoterId(self):
         return self.voterId
 
-    def SetPositionWithCandidateId(self, position: Position, candidateId):
+    def SetVote(self, position: Position, candidateId):
         self.voteDict[str(position).split('.')[1]] = candidateId
+
+    def ClearVote(self, position: Position):
+        self.voteDict[str(position).split('.')[1]] = None
 
     def GetVoteFromPosition(self, position: Position):
         return self.voteDict[str(position).split('.')[1]]

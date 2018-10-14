@@ -16,12 +16,16 @@ class Voter(User):
         return cls(user.GetUserId(), user.GetProgram(), user.GetFirstName(), user.GetMidName(),
                    user.GetLastName(), user.GetPassword())
 
+    def get_user_equivalent(self):
+        return User(self.GetUserId(), self.GetProgram(), self.GetFirstName(), self.GetMidName(),
+                    self.GetLastName(), self.GetPassword())
+
     def SetVoteTicket(self, voteTicket):
         self.voteTicket = voteTicket
 
     def VoteFor(self, candidateId, position: Position):
         #   set candidate to appropriate position in voteTicket
-        self.voteTicket.SetPositionWithCandidateId(position, candidateId)
+        self.voteTicket.SetVote(position, candidateId)
 
     def GetVoteTicket(self):
         return self.voteTicket

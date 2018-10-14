@@ -1,3 +1,4 @@
 {
+  "testCase.py::TestCase::test_election_function_VerifyVoteTicket_valid_vote_matching_position_and_candidateId": true,
   "testCase.py::TestCases::testCase3": true
 }
