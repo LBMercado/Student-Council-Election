@@ -11,13 +11,17 @@ from UI.Registration import Ui_Registration
 from UI.StudentCouncilElection import Ui_StudentCouncilElection
 from UI.Admin import Ui_Admin
 from BusinessLogic.UserInterface import UserInterface
-from BusinessLogic.ElectionInterface import ElectionInterface
+from BusinessLogic.Election import Election
+from BusinessLogic.Admin import Admin
 
 class Ui_LogIn(object):
     def setupUi(self, LogIn):
+        #   custom variables
         self.LogIn = LogIn
         self.userInterface = UserInterface()
-        self.election = ElectionInterface()
+        self.election = None
+        self.projDirectory = os.getcwd()
+
         LogIn.setObjectName("LogIn")
         LogIn.setFixedSize(630, 507)
 #        LogIn.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -78,13 +82,12 @@ class Ui_LogIn(object):
         self.labelMapuaLogo = QtWidgets.QLabel(LogIn)
         self.labelMapuaLogo.setObjectName("labelMapuaLogo")
         self.labelMapuaLogo.setGeometry(390,45,150,150)
-        projDirectory = os.path.normpath(os.getcwd() + os.sep + os.pardir) + '\PyCharm_Project_Env'
-        pic = QtGui.QPixmap(projDirectory + "\Resources\MapuaLogo.png")
+        pic = QtGui.QPixmap(self.projDirectory + "\Resources\MapuaLogo.png")
         self.labelMapuaLogo.setPixmap(pic)
-        projDirectory = projDirectory.replace("\\", "/")
-        background = ("QWidget#LogIn{background-image: url(\""+projDirectory
+        projDirectory = self.projDirectory.replace("\\", "/")
+        background = ("QWidget#LogIn{background-image: url(\""+ projDirectory
                             +"/Resources/LogInBackground.jpg\"); background-position: center;}")
-        LogIn.setStyleSheet(background + open(projDirectory
+        LogIn.setStyleSheet(background + open(self.projDirectory
         + "\Resources\Design.qss",'r').read())
         self.StudentCouncilElection = QtWidgets.QWidget()
         self.ui = Ui_StudentCouncilElection()
@@ -103,8 +106,15 @@ class Ui_LogIn(object):
         LogIn.setTabOrder(self.lineEditPassword, self.pushButtonLogin)
         LogIn.setTabOrder(self.pushButtonLogin, self.pushButtonCreateAccount)
         LogIn.setWindowIcon(QtGui.QIcon(projDirectory
-        + "\Resources\MapuaIcon.png"))      
-        
+        + "\Resources\MapuaIcon.png"))
+
+        #   there must be an election date for it to continue
+        if (not Election.ElectionExists()):
+            #   inform user there is no current election
+            pic = QtGui.QPixmap(self.projDirectory + "\Resources\errorIcon")
+            self.labelErrorIcon.setPixmap(pic)
+            self.labelError.setText("There is no current election in progress.")
+
     def retranslateUi(self, LogIn):
         _translate = QtCore.QCoreApplication.translate
         LogIn.setWindowTitle(_translate("LogIn", "Mapua University"))
@@ -122,33 +132,34 @@ class Ui_LogIn(object):
         self.uiAdmin.pushButton.clicked.connect(self.reLogInAdmin)
         
     def logIn(self):
-        inputUsername = self.lineEditUsername.text()
-        inputPassword = self.lineEditPassword.text()
+        inputUsername = self.lineEditUsername.text().strip()
+        inputPassword = self.lineEditPassword.text().strip()
         self.userInterface.set_user_email_and_password(inputUsername, inputPassword)
         #   there must be an election date for it to continue
-        if (not self.election.CheckElection()):
+        if (not Election.ElectionExists()):
             #   inform user there is no current election
-            pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
+            pic = QtGui.QPixmap(self.projDirectory + "\Resources\errorIcon")
             self.labelErrorIcon.setPixmap(pic)
             #   however, admin can still login, need to check this
             user = self.userInterface.GetUser()
-            if self.userInterface.is_Admin():
+            if self.userInterface.is_User() and self.userInterface.is_Admin():
                 self.labelError.setText("Admin override.")
-                self.uiAdmin.passLoginVals(user)
+                self.uiAdmin.PassAdminInfo(user)
                 self.Admin.show()
                 self.LogIn.hide()
             else:
                 self.labelError.setText("There is no current election in progress.")
                 return
         else:
-            #   open a new connection to a database pertaining to the existing election
-            # datAcc.newConnection('election_' + ''.join(str(existingElecDates[0][0].date()).split('-')) + '.db')
+            # an election exists, load an instance of the election from the database
+            self.election = Election(Election.GetExistingElectionStartDate())
+            self.election.SetEndDate(Election.GetExistingElectionEndDate())
             if inputUsername == "":
-                pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
+                pic = QtGui.QPixmap(self.projDirectory + "\Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)
                 self.labelError.setText("Please enter email.")
             elif inputPassword == "":
-                pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir) + "\Resources\errorIcon")
+                pic = QtGui.QPixmap(self.projDirectory + "\Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)
                 self.labelError.setText("Please enter password.")
             elif self.userInterface.user_email_is_valid():  # email exists
@@ -156,23 +167,36 @@ class Ui_LogIn(object):
                     #   must check if user is an admin
                     if self.userInterface.is_Admin():
                         user = self.userInterface.GetUser()
-                        self.labelError.setText("Admin override.")
-                        self.uiAdmin.passLoginVals(user)
+                        self.labelError.setText("")
+                        self.uiAdmin.PassAdminInfo(user)
                         self.Admin.show()
                         self.LogIn.hide()
                     else:
-                        self.StudentCouncilElection.show()
-                        self.ui.setProfile(inputUsername, inputPassword)
-                        self.LogIn.hide()
+                        #   IMPORTANT: Candidates cannot login
+                        if self.userInterface.is_Candidate():
+                            pic = QtGui.QPixmap(self.projDirectory + "\Resources\errorIcon")
+                            self.labelErrorIcon.setPixmap(pic)
+                            self.labelError.setText("Only voters are allowed to login.")
+                            return
+                        else:
+                            #   revert user back to User
+                            self.userInterface.is_User()
+                            self.StudentCouncilElection.show()
+                            self.ui.pass_user_interface(self.userInterface)
+                            self.ui.pass_election_interface(self.election)
+                            user = self.userInterface.GetUser()
+                            fullName = user.GetLastName() + ', ' + user.GetFirstName() + ' ' + user.GetMidName()
+                            self.ui.setProfile(fullName, str(user.GetUserId()))
+                            self.LogIn.hide()
                 else:
                     self.emptyPassword = True
                     self.resetPassword()
-                    pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir)
+                    pic = QtGui.QPixmap(self.projDirectory
                                         + "\Resources\errorIcon")
                     self.labelErrorIcon.setPixmap(pic)
                     self.labelError.setText("Incorrect password.")
             else:
-                pic = QtGui.QPixmap(os.path.normpath(os.getcwd() + os.sep + os.pardir)
+                pic = QtGui.QPixmap(self.projDirectory
                                     + "\Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)
                 self.labelError.setText("Email does not exist.")

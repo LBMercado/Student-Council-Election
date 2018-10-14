@@ -5,11 +5,20 @@ from BusinessLogic.testCase import TestCase
 from UI.LogIn import Ui_LogIn
 from PyQt5 import QtWidgets
 import unittest
-import sys
+import sys, os
 
 if __name__ == "__main__":
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestCase)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+
+    runTests = False
+
+    if (runTests):
+        suite = unittest.TestLoader().loadTestsFromTestCase(TestCase)
+        unittest.TextTestRunner(verbosity=2).run(suite)
+        #   remove test db
+        try:
+            os.remove('Database/test.db')
+        except FileNotFoundError:
+            print('db file not found.')
 
     #   main program
     app = QtWidgets.QApplication(sys.argv)

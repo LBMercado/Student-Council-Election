@@ -20,16 +20,18 @@ class Candidate(User):
 
         self.platform = "This candidate has no platform at this time."
 
+        self.picturePath = ''
+
     def SetPosition(self, position):
         self.position = position
 
     def GetPosition(self):
         return self.position
 
-    def SetParty(self, party):
+    def SetPartyName(self, party):
         self.partyName = party
 
-    def GetParty(self):
+    def GetPartyName(self):
         return self.partyName
 
     def SetPlatform(self, platform):
@@ -37,3 +39,9 @@ class Candidate(User):
 
     def GetPlatform(self):
         return self.platform
+
+    def SetPicturePath(self, picturePath):
+        self.picturePath = picturePath
+
+    def GetPicturePath(self):
+        return self.picturePath

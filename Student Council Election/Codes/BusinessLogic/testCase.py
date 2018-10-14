@@ -1,14 +1,14 @@
 from BusinessLogic.Candidate import Candidate
 from BusinessLogic.Position import Position
 from BusinessLogic.Party import Party
-from BusinessLogic.VoteTicket import VoterTicket
+from BusinessLogic.VoteTicket import VoteTicket
 from BusinessLogic.Election import Election
 from BusinessLogic.UserInterface import UserInterface
 from UI.LogIn import Ui_LogIn
 from DataAccess.DataAccess import DataAccess
 from PyQt5 import QtWidgets
 from datetime import datetime
-import unittest, sys
+import unittest, sys, os
 
 class TestCase(unittest.TestCase):
     def test_login_interface_blank_email_and_password(self):
@@ -40,6 +40,69 @@ class TestCase(unittest.TestCase):
         ui = UserInterface()
         ui.set_user_email_and_password('lbzmercado@mymail.mapua.edu.ph', '2015102131')
         self.assertTrue(ui.is_User())
+
+    def test_election_init(self):
+        elect = Election.init_with_null_and_dbName('test.db')
+
+    def test_election_function_VerifyVoteTicket_valid_vote_matching_position_and_candidateId(self):
+        el = Election.init_with_null_and_dbName('test.db')
+        tick = el.GetVoterTicket(2015102131)
+
+        #	valid vote, matching position and candidateId
+        tick.SetVote(Position.SECRETARY_EXECUTIVE, 2015104103)
+        res = el.VerifyVoteTicket(tick)
+        self.assertTrue(res, 'valid vote, matching position and candidateId')
+        print('result: ' + str(res))
+        tick.ClearVote(Position.SECRETARY_EXECUTIVE)
+
+    def test_election_function_VerifyVoteTicket_invalid_vote_matching_position_only_nonexistent_candidateId(self):
+        el = Election.init_with_null_and_dbName('test.db')
+        tick = el.GetVoterTicket(2015102131)
+
+        #	invalid vote, matching position only, nonexistent candidateId
+        tick.SetVote(Position.SECRETARY_EXECUTIVE, 2015104102)
+        res = el.VerifyVoteTicket(tick)
+        self.assertFalse(res, 'invalid vote, matching position only, nonexistent candidateId')
+        print('result: ' + str(res))
+        tick.ClearVote(Position.SECRETARY_EXECUTIVE)
+
+    def test_election_function_VerifyVoteTicket_invalid_vote_matching_candidateId_only(self):
+        el = Election.init_with_null_and_dbName('test.db')
+        tick = el.GetVoterTicket(2015102131)
+
+        #	invalid vote, matching candidateId only
+        tick.SetVote(Position.SECRETARY_WELFARE_DEV, 2015104103)
+        res = el.VerifyVoteTicket(tick)
+        self.assertFalse(res, 'invalid vote, matching candidateId only')
+        print('result: ' + str(res))
+        tick.ClearVote(Position.SECRETARY_WELFARE_DEV)
+
+    def test_election_function_VerifyVoteTicket_invalid_vote_no_match_nonexistent_candidateId(self):
+        el = Election.init_with_null_and_dbName('test.db')
+        tick = el.GetVoterTicket(2015102131)
+
+        #	invalid vote, no match, nonexistent candidateId
+        tick.SetVote(Position.SECRETARY_WELFARE_DEV, 2015104102)
+        res = el.VerifyVoteTicket(tick)
+        self.assertFalse(res, 'invalid vote, no match, nonexistent candidateId')
+        print('result: ' + str(res))
+        tick.ClearVote(Position.SECRETARY_WELFARE_DEV)
+
+    def test_election_function_VerifyVoteTicket_invalid_vote_candidateId_and_position_mismatch(self):
+        el = Election.init_with_null_and_dbName('test.db')
+        tick = el.GetVoterTicket(2015102131)
+
+        #	invalid vote, candidateId and position mismatch
+        tick.SetVote(Position.REPRESENTATIVE_4TH_YEAR, 2015141516)
+        res = el.VerifyVoteTicket(tick)
+        self.assertFalse(res,'invalid vote, candidateId and position mismatch')
+        print('result: ' + str(res))
+        tick.ClearVote(Position.REPRESENTATIVE_4TH_YEAR)
+
+    #   standard name for test dbs = test.db
+    def dbCleanup(self):
+        os.remove('Database/test.db')
+
     #   Business Logic Test 1
     # def testCase1(self):
     #     indepPart = 'Independent'
