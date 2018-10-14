@@ -6,6 +6,7 @@ from BusinessLogic.User import User
 from BusinessLogic.Candidate import Candidate
 from BusinessLogic.Voter import Voter
 from BusinessLogic.Admin import Admin
+from BusinessLogic.VoteTicket import VoteTicket
 
 #   this class links the data access layer with the user interface of the application
 class UserInterface():
@@ -38,7 +39,9 @@ class UserInterface():
             if returnedUser is not None:
                 self.user = returnedUser
                 if self.user.program.upper() == 'ADMINISTRATOR':
+                    adminId = self.user.GetUserId()
                     self.user = Admin.morph_user_to_admin(self.user)
+                    self.user.SetUserId(adminId)
                     return True
                 else:
                     return False
@@ -67,6 +70,14 @@ class UserInterface():
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
         if not self.is_Candidate() or not self.is_Admin():
             self.user = Voter.morph_user_to_voter(self.user)
+            voteTick = self.data.ReadVoteTicketWithUserId(self.user.GetUserId())
+
+            #   check if this is a new voter, no record of voteticket
+            if voteTick is None:
+                self.user.SetVoteTicket(VoteTicket(self.user.GetUserId()))
+            else:
+                self.user.SetVoteTicket(voteTick)
+
             return True
         else:
             return False
@@ -90,11 +101,12 @@ class UserInterface():
         return self.user
 
     #   updates user password from database
-    def UpdateUser(self):
+    def UpdateUserPassword(self, newPassword: str):
         if self.user is None:
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
         else:
             #   look into database and find if user exists
+            self.user.SetPassword(newPassword)
             self.data.UpdateUser(self.user)
 
 #

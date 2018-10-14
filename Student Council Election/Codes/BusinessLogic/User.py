@@ -60,6 +60,11 @@ class User:
         password = None
         return cls(userId, program, firstName, middleName, lastName, password)
 
+    @staticmethod
+    def morph_child_to_base(child):
+        return User(child.GetUserId(), child.GetProgram(), child.GetFirstName(), child.GetMidName(), child.GetLastName(),
+                   child.GetPassword())
+
     def GetUserId(self):
         return self.userId
 

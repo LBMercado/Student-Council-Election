@@ -168,6 +168,8 @@ class Election:
         #   candidateId must be in list otherwise, raise an error
         for partyInList in self.partyList:
             for candidateInParty in partyInList.GetCandidateList():
+                if candidateInParty is None:
+                    continue
                 if candidateInParty.userId is candidateId:
                     candPosition = candidateInParty.GetPosition()
                     candidateIsInList = True

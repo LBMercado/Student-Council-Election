@@ -5,68 +5,61 @@ from DataAccess.DataAccess import DataAccess
 from BusinessLogic.User import User
 from BusinessLogic.Admin import Admin
 from BusinessLogic.UserInterface import UserInterface, UserNotFound, UserNotYetDefined
+from BusinessLogic.Candidate import Candidate
 
 #   this class links the data access layer with the user interface of the application
 class AdminInterface(UserInterface):
     def __init__(self, admin: Admin):
         UserInterface.__init__(self)
-        self.userList = self.data.ReadAllUsers()
-        self.user = None
+        self.userDict = {}
+        for user in self.data.ReadAllUsers():
+            self.userDict[user.GetUserId()]= user
         self.admin = admin
+        self.adminCount = 0
 
-    #   return true if user, otherwise return false
+        for user in self.userDict.values():
+            if user.GetProgram().upper() == 'ADMINISTRATOR':
+                self.adminCount += 1
+
+    #   return true if user is in database, otherwise returns false
     def is_User(self):
-        #   throw an error if user is still null
+        #   look into database and find if user exists
         if self.user is None:
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
         else:
-            #   look into database and find if user exists
-            #   have to check if user is set using email and password, or student number
-            if self.user.GetUserId() is not None:
-                returnedUser = self.data.ReadUser_with_userId(self.user.GetUserId())
-            else:
-                returnedUser = self.data.ReadUser_with_email_and_password(self.user.GetEmail(), self.user.GetPassword())
-            if returnedUser is not None:
-                self.user = returnedUser
+            if self.user.GetUserId() in self.userDict:
                 return True
             else:
                 return False
 
-    #   return true if admin, otherwise return false
+    #   return true if user is in database and is an admin, otherwise return false
     def is_Admin(self):
         #   throw an error if user is still null
         if self.user is None:
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
         else:
             #   get user info
-            #   have to check if user is set using email and password, or student number
-            if self.user.GetUserId() is not None:
-                returnedUser = self.data.ReadUser_with_userId(self.user.GetUserId())
-            else:
-                returnedUser = self.data.ReadUser_with_email_and_password(self.user.GetEmail(), self.user.GetPassword())
-            if returnedUser is not None:
+            if self.user.GetUserId() in self.userDict:
+                returnedUser = self.userDict[self.user.GetUserId()]
                 self.user = returnedUser
                 return self.user.program.upper() == 'ADMINISTRATOR'
             else:
-                raise UserNotFound('User was not found in the database. '
-                                   'Try to call the \"is_User\" function first before calling this one.')
+                return False
 
-    #   return true if candidate, otherwise return false
+    #   return true if user is in database and is a candidate, otherwise return false
     def is_Candidate(self):
         #   throw an error if user is still null
         if self.user is None:
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
         else:
             #   get candidate info
-            #   have to check if user is set using email and password, or student number
-            if self.user.GetUserId() is not None:
+            if self.user.GetUserId() in self.userDict:
                 returnedCandidate = self.data.ReadCandidate_with_userId(self.user.GetUserId())
-            else:
-                returnedCandidate = self.data.ReadCandidate_with_email_and_password(self.user.GetEmail(),
-                                                                                self.user.GetPassword())
-            if returnedCandidate is not None:
-                self.user = returnedCandidate
-                return True
+                if returnedCandidate is None:
+                    return False
+                else:
+                    self.user = returnedCandidate
+                    return self.user is not None
             else:
                 return False
 
@@ -76,6 +69,7 @@ class AdminInterface(UserInterface):
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
 
         self.data.RemoveSpecificUser(self.user)
+        del self.userDict[self.user.GetUserId()]
 
     #   updates the set user if it exists in the database, otherwise throws an error
     def update_user(self):
@@ -83,9 +77,11 @@ class AdminInterface(UserInterface):
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
 
         self.data.UpdateUser(self.user)
+        if isinstance(self.user, Candidate):
+            self.data.UpdateCandidate(self.user)
 
     #   adds the set user if it does not exist yet in the database
-    def add_user(self):
+    def add_user_to_database(self):
         if self.user is None:
             raise UserNotYetDefined('User is not yet defined, cannot proceed to look into database.')
 
@@ -95,15 +91,52 @@ class AdminInterface(UserInterface):
     def is_user_admin(self):
         if self.user is None:
             raise UserNotYetDefined('User is not yet defined.')
-
         #   remember that all admins have the same program: ADMINISTRATOR
         if self.user.GetProgram() == "ADMINISTRATOR":
             return True
         else:
             return False
 
-    def set_user_userId(self, userId):
-        self.user = User.init_with_userId(userId)
+    def is_user_set(self):
+        return self.user is not None
+
+    def set_user_using_userId(self, userId):
+        if userId in self.userDict:
+            self.user = self.userDict[userId]
+
+    def set_new_user(self, newUser:User):
+        if newUser.GetUserId() not in self.userDict:
+            self.user = newUser
+            self.userDict[newUser.GetUserId()] = newUser
+            if self.is_Admin():
+                self.adminCount = 0
+                for user in self.userDict.values():
+                    if user.GetProgram().upper() == 'ADMINISTRATOR':
+                        self.adminCount += 1
+                #   revert back to User
+                self.is_User()
+
+    def set_updated_user(self, updatedUser):
+        if updatedUser.GetUserId() in self.userDict:
+            self.user = updatedUser
+            self.userDict[updatedUser.GetUserId()] = updatedUser
+            if self.is_Admin():
+                self.adminCount = 0
+                for user in self.userDict.values():
+                    if user.GetProgram().upper() == 'ADMINISTRATOR':
+                        self.adminCount += 1
+                #   revert back to User
+                self.is_User()
 
     def reset_user(self):
         self.user = None
+
+    def get_admin_count(self):
+        return self.adminCount
+
+    def  is_super_admin(self):
+        #   super admin has id = 0
+        if self.admin.GetUserId() == 0:
+            return True
+        else:
+            return False

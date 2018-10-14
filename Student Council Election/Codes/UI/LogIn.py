@@ -106,8 +106,15 @@ class Ui_LogIn(object):
         LogIn.setTabOrder(self.lineEditPassword, self.pushButtonLogin)
         LogIn.setTabOrder(self.pushButtonLogin, self.pushButtonCreateAccount)
         LogIn.setWindowIcon(QtGui.QIcon(projDirectory
-        + "\Resources\MapuaIcon.png"))      
-        
+        + "\Resources\MapuaIcon.png"))
+
+        #   there must be an election date for it to continue
+        if (not Election.ElectionExists()):
+            #   inform user there is no current election
+            pic = QtGui.QPixmap(self.projDirectory + "\Resources\errorIcon")
+            self.labelErrorIcon.setPixmap(pic)
+            self.labelError.setText("There is no current election in progress.")
+
     def retranslateUi(self, LogIn):
         _translate = QtCore.QCoreApplication.translate
         LogIn.setWindowTitle(_translate("LogIn", "Mapua University"))
@@ -125,8 +132,8 @@ class Ui_LogIn(object):
         self.uiAdmin.pushButton.clicked.connect(self.reLogInAdmin)
         
     def logIn(self):
-        inputUsername = self.lineEditUsername.text()
-        inputPassword = self.lineEditPassword.text()
+        inputUsername = self.lineEditUsername.text().strip()
+        inputPassword = self.lineEditPassword.text().strip()
         self.userInterface.set_user_email_and_password(inputUsername, inputPassword)
         #   there must be an election date for it to continue
         if (not Election.ElectionExists()):
@@ -136,7 +143,6 @@ class Ui_LogIn(object):
             #   however, admin can still login, need to check this
             user = self.userInterface.GetUser()
             if self.userInterface.is_User() and self.userInterface.is_Admin():
-                user = Admin.morph_user_to_admin(user)
                 self.labelError.setText("Admin override.")
                 self.uiAdmin.PassAdminInfo(user)
                 self.Admin.show()
@@ -146,8 +152,8 @@ class Ui_LogIn(object):
                 return
         else:
             # an election exists, load an instance of the election from the database
-            self.election = Election.init_with_startAndEndDate(Election.GetExistingElectionStartDate(),
-                                                               Election.GetExistingElectionEndDate())
+            self.election = Election(Election.GetExistingElectionStartDate())
+            self.election.SetEndDate(Election.GetExistingElectionEndDate())
             if inputUsername == "":
                 pic = QtGui.QPixmap(self.projDirectory + "\Resources\errorIcon")
                 self.labelErrorIcon.setPixmap(pic)
@@ -161,17 +167,27 @@ class Ui_LogIn(object):
                     #   must check if user is an admin
                     if self.userInterface.is_Admin():
                         user = self.userInterface.GetUser()
-                        user = Admin.morph_user_to_admin(user)
                         self.labelError.setText("")
                         self.uiAdmin.PassAdminInfo(user)
                         self.Admin.show()
                         self.LogIn.hide()
                     else:
-                        self.StudentCouncilElection.show()
-                        self.ui.pass_user_interface(self.userInterface)
-                        self.ui.init_election_interface()
-                        self.ui.setProfile(inputUsername, inputPassword)
-                        self.LogIn.hide()
+                        #   IMPORTANT: Candidates cannot login
+                        if self.userInterface.is_Candidate():
+                            pic = QtGui.QPixmap(self.projDirectory + "\Resources\errorIcon")
+                            self.labelErrorIcon.setPixmap(pic)
+                            self.labelError.setText("Only voters are allowed to login.")
+                            return
+                        else:
+                            #   revert user back to User
+                            self.userInterface.is_User()
+                            self.StudentCouncilElection.show()
+                            self.ui.pass_user_interface(self.userInterface)
+                            self.ui.pass_election_interface(self.election)
+                            user = self.userInterface.GetUser()
+                            fullName = user.GetLastName() + ', ' + user.GetFirstName() + ' ' + user.GetMidName()
+                            self.ui.setProfile(fullName, str(user.GetUserId()))
+                            self.LogIn.hide()
                 else:
                     self.emptyPassword = True
                     self.resetPassword()

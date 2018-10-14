@@ -6,6 +6,35 @@ QListWidget{
 	color: white;
 	border: 0px;
 }
+QGroupBox{
+	border: 0px;
+}
+QPushButton#pushButtonEditPromote {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonEditDemote {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonHideEdit {
+	background-color: transparent;
+	color: gray;
+	border: 3px solid gray;
+	border-radius: 20px;
+}
+QPushButton#pushButtonHideEdit_2 {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonUser {
+	background-color: #FF0000;
+	color: white;
+}
+QPushButton#pushButtonAdmin {
+	background-color: #FF0000;
+	color: white;
+}
 QPushButton#pushButtonCreate {
 	background-color: #FF0000;
 	color: white;
@@ -111,6 +140,10 @@ QLineEdit{
 QLineEdit::hover{
 	border-bottom-color: white;
 }
+QTextEdit#textEditPlatform{
+	border-left: 0px;
+	border-right: 0px;
+}
 QLabel{
 	color: white;
 	weight: 5px;
@@ -136,6 +169,10 @@ QLabel#labelError{
 	weight: 2px;
 }
 QPushButton#pushButtonCreateAccount::hover{
+	border-color: #FF0000;
+	color: #FF0000;
+}
+QPushButton#pushButtonHideEdit::hover{
 	border-color: #FF0000;
 	color: #FF0000;
 }

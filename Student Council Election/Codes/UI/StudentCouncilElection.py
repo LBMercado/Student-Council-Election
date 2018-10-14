@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 import os
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 from BusinessLogic.Election import Election
 from BusinessLogic.Position import Position
 from BusinessLogic.UserInterface import UserInterface
@@ -15,10 +15,11 @@ class Ui_StudentCouncilElection(object):
     def setupUi(self, StudentCouncilElection):
         self.fullName = "LastName, GivenName MI"
         self.email = "someone@mymail.mapua.edu.ph"
+        self.projDirectory = os.getcwd()
         StudentCouncilElection.setObjectName("StudentCouncilElection")
         StudentCouncilElection.resize(1200, 600)
         self.listWidget = QtWidgets.QListWidget(StudentCouncilElection)
-        self.listWidget.setGeometry(QtCore.QRect(20, 80, 91, 401))
+        self.listWidget.setGeometry(QtCore.QRect(20, 80, 120, 401))
         self.listWidget.setObjectName("listWidget")
         item = QtWidgets.QListWidgetItem()
         self.listWidget.addItem(item)
@@ -215,8 +216,7 @@ class Ui_StudentCouncilElection(object):
         self.labelProfile.setFont(font)
         self.index = 0
         print(os.getcwd())
-        projDirectory = os.path.normpath(os.getcwd() + os.sep + os.pardir) + '\PyCharm_Project_Env'
-        projDirectory = projDirectory.replace("\\", "/")
+        projDirectory = self.projDirectory.replace("\\", "/")
         background = ("QWidget#StudentCouncilElection{background-image: url(\"" + projDirectory
                             +"/Resources/LogInBackground.jpg\"); background-position: center;}")
         StudentCouncilElection.setStyleSheet(background + open(projDirectory + "\Resources\Design.qss",'r').read())
@@ -225,6 +225,11 @@ class Ui_StudentCouncilElection(object):
         self.labelPic1.setPixmap(pic)
         self.retranslateUi(StudentCouncilElection)
         QtCore.QMetaObject.connectSlotsByName(StudentCouncilElection)
+        self.rdBtnGrp = Qt.QButtonGroup()
+        self.rdBtnGrp.addButton(self.checkBoxCandidate1)
+        self.rdBtnGrp.addButton(self.checkBoxCandidate2)
+        self.rdBtnGrp.addButton(self.checkBoxCandidate3)
+        self.rdBtnGrp.addButton(self.checkBoxCandidate4)
 
     def retranslateUi(self, StudentCouncilElection):
         _translate = QtCore.QCoreApplication.translate
@@ -258,31 +263,124 @@ class Ui_StudentCouncilElection(object):
         self.labelD4.setText(_translate("StudentCouncilElection", "Description4"))
         self.pushButtonNext.clicked.connect(self.nextPos)
         self.pushButtonPrev.clicked.connect(self.prevPos)
-        
+        self.pushButtonChangePass.clicked.connect(self.ChangePassword)
+        self.checkBoxCandidate1.clicked.connect(self.VoteForCandidate1)
+        self.checkBoxCandidate2.clicked.connect(self.VoteForCandidate2)
+        self.pushButtonSubmit.clicked.connect(self.FinalizeVotes)
+
     def nextPos(self):
         self.index += 1
         if self.index == 0:
             self.labelPosition.setText("PRESIDENT")
+            self.load_election_interface(Position.PRESIDENT)
         elif self.index == 1:
             self.pushButtonPrev.setEnabled(True)
-            self.labelPosition.setText("VICE PRESIDENT")
+            self.labelPosition.setText("INTERNAL VICE PRESIDENT")
+            self.load_election_interface(Position.VICE_PRESIDENT_INT)
         elif self.index == 2:
-            self.labelPosition.setText("EXECUTIVE")
+            self.labelPosition.setText("EXTERNAL VICE PRESIDENT")
+            self.load_election_interface(Position.VICE_PRESIDENT_EXT)
         elif self.index == 3:
+            self.labelPosition.setText("EXECUTIVE SECRETARY")
+            self.load_election_interface(Position.SECRETARY_EXECUTIVE)
+        elif self.index == 4:
+            self.labelPosition.setText("SECRETARY OF FINANCE")
+            self.load_election_interface(Position.SECRETARY_FINANCE)
+        elif self.index == 5:
+            self.labelPosition.setText("SECRETARY OF AUDIT")
+            self.load_election_interface(Position.SECRETARY_AUDIT)
+        elif self.index == 6:
+            self.labelPosition.setText("SECRETARY OF LOGISTICS")
+            self.load_election_interface(Position.SECRETARY_LOGISTICS)
+        elif self.index == 7:
+            self.labelPosition.setText("SECRETARY OF SCHOLARSHIP AFFAIRS")
+            self.load_election_interface(Position.SECRETARY_SCHOLARSHIP)
+        elif self.index == 8:
+            self.labelPosition.setText("SECRETARY OF INFORMATION AND CORRESPONDENCE")
+            self.load_election_interface(Position.SECRETARY_INFO_CORRESPONDENCE)
+        elif self.index == 9:
+            self.labelPosition.setText("SECRETARY OF AMUSEMENT AND RECREATION")
+            self.load_election_interface(Position.SECRETARY_AMUSEMENT_RECREATION)
+        elif self.index == 10:
+            self.labelPosition.setText("SECRETARY OF WELFARE AND DEVELOPMENT")
+            self.load_election_interface(Position.SECRETARY_WELFARE_DEV)
+        elif self.index == 11:
+            self.labelPosition.setText("4TH YEAR REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_4TH_YEAR)
+        elif self.index == 12:
+            self.labelPosition.setText("3RD YEAR REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_3RD_YEAR)
+        elif self.index == 13:
+            self.labelPosition.setText("2ND YEAR REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_2ND_YEAR)
+        elif self.index == 14:
+            self.labelPosition.setText("GENERAL ENGINEERING REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_GENERAL)
+        elif self.index == 15:
+            self.labelPosition.setText("CSC REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_CSC)
+        elif self.index == 16:
             self.pushButtonNext.setEnabled(False)
-            self.labelPosition.setText("FINANCE")
+            self.labelPosition.setText("BUSINESS MANAGER")
+            self.load_election_interface(Position.BUSINESS_MANAGER)
+
     def prevPos(self):
         self.index -= 1
+
         if self.index == 0:
             self.pushButtonPrev.setEnabled(False)
             self.labelPosition.setText("PRESIDENT")
+            self.load_election_interface(Position.PRESIDENT)
         elif self.index == 1:
-            self.labelPosition.setText("VICE PRESIDENT")
+            self.labelPosition.setText("INTERNAL VICE PRESIDENT")
+            self.load_election_interface(Position.VICE_PRESIDENT_INT)
         elif self.index == 2:
-            self.pushButtonNext.setEnabled(True)
-            self.labelPosition.setText("EXECUTIVE")
+            self.labelPosition.setText("EXTERNAL VICE PRESIDENT")
+            self.load_election_interface(Position.VICE_PRESIDENT_EXT)
         elif self.index == 3:
-            self.labelPosition.setText("FINANCE")
+            self.labelPosition.setText("EXECUTIVE SECRETARY")
+            self.load_election_interface(Position.SECRETARY_EXECUTIVE)
+        elif self.index == 4:
+            self.labelPosition.setText("SECRETARY OF FINANCE")
+            self.load_election_interface(Position.SECRETARY_FINANCE)
+        elif self.index == 5:
+            self.labelPosition.setText("SECRETARY OF AUDIT")
+            self.load_election_interface(Position.SECRETARY_AUDIT)
+        elif self.index == 6:
+            self.labelPosition.setText("SECRETARY OF LOGISTICS")
+            self.load_election_interface(Position.SECRETARY_LOGISTICS)
+        elif self.index == 7:
+            self.labelPosition.setText("SECRETARY OF SCHOLARSHIP AFFAIRS")
+            self.load_election_interface(Position.SECRETARY_SCHOLARSHIP)
+        elif self.index == 8:
+            self.labelPosition.setText("SECRETARY OF INFORMATION AND CORRESPONDENCE")
+            self.load_election_interface(Position.SECRETARY_INFO_CORRESPONDENCE)
+        elif self.index == 9:
+            self.labelPosition.setText("SECRETARY OF AMUSEMENT AND RECREATION")
+            self.load_election_interface(Position.SECRETARY_AMUSEMENT_RECREATION)
+        elif self.index == 10:
+            self.labelPosition.setText("SECRETARY OF WELFARE AND DEVELOPMENT")
+            self.load_election_interface(Position.SECRETARY_WELFARE_DEV)
+        elif self.index == 11:
+            self.labelPosition.setText("4TH YEAR REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_4TH_YEAR)
+        elif self.index == 12:
+            self.labelPosition.setText("3RD YEAR REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_3RD_YEAR)
+        elif self.index == 13:
+            self.labelPosition.setText("2ND YEAR REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_2ND_YEAR)
+        elif self.index == 14:
+            self.labelPosition.setText("GENERAL ENGINEERING REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_GENERAL)
+        elif self.index == 15:
+            self.pushButtonNext.setEnabled(True)
+            self.labelPosition.setText("CSC REPRESENTATIVE")
+            self.load_election_interface(Position.REPRESENTATIVE_CSC)
+        elif self.index == 16:
+            self.labelPosition.setText("BUSINESS MANAGER")
+            self.load_election_interface(Position.BUSINESS_MANAGER)
+
     def setProfile(self, fullName, email):
         self.labelProfile.setText(fullName + "\n" + email)
 
@@ -290,10 +388,166 @@ class Ui_StudentCouncilElection(object):
         self.userInterface = userInterface
         #   set user as a voter
         self.userInterface.is_Voter()
+        self.userVoter = self.userInterface.GetUser()
 
-    def init_election_interface(self):
-        self.electionInterface = Election.init_with_startAndEndDate(Election.GetExistingElectionStartDate(),
-                                          Election.GetExistingElectionEndDate())
+    def pass_election_interface(self, electionInt: Election):
+        self.electionInterface = electionInt
+        self.index = 0
+
+        strPositions = ['PRESIDENT', 'INTERNAL VICE PRESIDENT', 'EXTERNAL VICE PRESIDENT', 'EXECUTIVE SECRETARY',
+                        'SECRETARY OF FINANCE', 'SECRETARY OF AUDIT', 'SECRETARY OF LOGISTICS',
+                        'SECRETARY OF SCHOLARSHIP AFFAIRS', 'SECRETARY OF INFORMATION AND CORRESPONDENCE',
+                        'SECRETARY OF AMUSEMENT AND RECREATION', 'SECRETARY OF WELFARE AND DEVELOPMENT',
+                        '4TH YEAR REPRESENTATIVE', '3RD YEAR REPRESENTATIVE', '2ND YEAR REPRESENTATIVE',
+                        'GENERAL ENGINEERING REPRESENTATIVE', 'CSC REPRESENTATIVE', 'BUSINESS MANAGER']
+        self.listWidget.clear()
+        self.listWidget.addItems(strPositions)
+
+        voteDict = self.userVoter.GetVoteTicket().GetVoteTicket()
+        index = 0
+        for vote in voteDict.keys():
+            if voteDict[vote] is not None:
+                self.listWidget.item(index).setForeground(Qt.QBrush(QtCore.Qt.green))
+            index += 1
+
+        self.load_election_interface(Position.PRESIDENT)
+
+    def load_election_interface(self, pos: Position):
+        #   president displayed at init
+        #   assume two parties
+        parties = self.electionInterface.GetPartyList()
+
+        #   uncheck all radio buttons
+        self.rdBtnGrp.setExclusive(False)
+        self.checkBoxCandidate1.setChecked(False)
+        self.checkBoxCandidate2.setChecked(False)
+        self.rdBtnGrp.setExclusive(True)
+        #   party 1
+        candidate = parties[0].GetCandidate(pos)
+        if candidate is not None:
+            #   show controls
+            self.checkBoxCandidate1.show()
+            self.labelD1.show()
+            self.labelPic1.show()
+            if len(candidate.GetMidName()) > 0:
+                self.checkBoxCandidate1.setText(candidate.GetFirstName() + ' ' +
+                                                candidate.GetMidName()[0] + '. ' +
+                                                candidate.GetLastName())
+            else:
+                self.checkBoxCandidate1.setText(candidate.GetFirstName()
+                                                + ' ' +
+                                                candidate.GetLastName())
+            #   party 1 : set picture
+            print(self.projDirectory + candidate.GetPicturePath())
+            picPath = os.path.join(self.projDirectory, candidate.GetPicturePath())
+            candidatePic = QtGui.QPixmap(picPath)
+            scaledCandPic = candidatePic.scaled(self.labelPic1.size(), QtCore.Qt.KeepAspectRatio)
+            self.labelPic1.setPixmap(scaledCandPic)
+
+            #   party 1 : set platform
+            self.labelD1.setText(candidate.GetPlatform())
+
+            #   check if this is voted by user
+            user_vote = self.userVoter.GetVoteTicket().GetVoteFromPosition(pos)
+            if user_vote is not None or\
+                user_vote == candidate.GetUserId():
+                #   if so, set this radio button
+                self.checkBoxCandidate1.setChecked(True)
+                self.listWidget.item(self.index).setForeground(Qt.QBrush(QtCore.Qt.green))
+
+        else:
+            #   hide controls
+            self.checkBoxCandidate1.hide()
+            self.labelD1.hide()
+            self.labelPic1.hide()
+
+        #   party 2
+        candidate = parties[1].GetCandidate(pos)
+        if candidate is not None:
+            #   show controls
+            self.checkBoxCandidate2.show()
+            self.labelD2.show()
+            self.labelPic2.show()
+
+            if len(candidate.GetMidName()) > 0:
+                self.checkBoxCandidate2.setText(candidate.GetFirstName() + ' ' +
+                                                candidate.GetMidName()[0] + '. ' +
+                                                candidate.GetLastName())
+            else:
+                self.checkBoxCandidate2.setText(candidate.GetFirstName()
+                                                + ' ' +
+                                                candidate.GetLastName())
+            #   party 2 : set picture
+            picPath = os.path.join(self.projDirectory, candidate.GetPicturePath())
+            candidatePic = QtGui.QPixmap(picPath)
+            scaledCandPic = candidatePic.scaled(self.labelPic1.size(), QtCore.Qt.KeepAspectRatio)
+            self.labelPic2.setPixmap(scaledCandPic)
+
+            #   party 2 : set platform
+            self.labelD2.setText(candidate.GetPlatform())
+
+            #   check if this is voted by user
+            user_vote = self.userVoter.GetVoteTicket().GetVoteFromPosition(pos)
+            if user_vote is not None or \
+                    user_vote == candidate.GetUserId():
+                #   if so, set this radio button
+                self.checkBoxCandidate1.setChecked(True)
+                self.listWidget.item(self.index).setForeground(Qt.QBrush(QtCore.Qt.green))
+        else:
+            self.checkBoxCandidate2.hide()
+            self.labelD2.hide()
+            self.labelPic2.hide()
+
+        #   hide other labels/controls
+        self.checkBoxCandidate3.hide()
+        self.labelD3.hide()
+        self.labelPic3.hide()
+        self.checkBoxCandidate4.hide()
+        self.labelD4.hide()
+        self.labelPic4.hide()
+
+    def ChangePassword(self):
+        #   ask for old password then set new one
+        inputDialog = QtWidgets.QInputDialog()
+        hasEnteredWrongPassword = True
+        while hasEnteredWrongPassword:
+            oldPassword, okPressed = QtWidgets.QInputDialog.getText(inputDialog,
+                                                                  'Reset Password',
+                                                                  'Enter your old password: ',
+                                                                  QtWidgets.QLineEdit.Password,
+                                                                  '')
+            if okPressed and oldPassword == self.userInterface.GetUser().GetPassword():
+                hasEnteredWrongPassword = False
+            elif not okPressed:
+                return
+
+        newPassword, okPressed = QtWidgets.QInputDialog.getText(inputDialog,
+                                                                'Reset Password',
+                                                                'Enter your new password: ',
+                                                                QtWidgets.QLineEdit.Password,
+                                                                '')
+        if okPressed:
+            self.userInterface.UpdateUserPassword(newPassword)
+
+    def VoteForCandidate1(self):
+        self.userVoter.VoteFor(self.electionInterface.GetPartyList()[0].GetCandidate(Position(self.index)).GetUserId(),
+                               Position(self.index))
+        self.listWidget.item(self.index).setForeground(Qt.QBrush(QtCore.Qt.green))
+    def VoteForCandidate2(self):
+        self.userVoter.VoteFor(self.electionInterface.GetPartyList()[1].GetCandidate(Position(self.index)).GetUserId(),
+                               Position(self.index))
+        self.listWidget.item(self.index).setForeground(Qt.QBrush(QtCore.Qt.green))
+
+    def FinalizeVotes(self):
+        self.electionInterface.UpdateVoter(self.userVoter)
+        msg = QtWidgets.QMessageBox()
+        successMsg = QtWidgets.QMessageBox()
+        successMsg.setIcon(QtWidgets.QMessageBox.Information)
+        successMsg.setText('Your vote has been submitted. Thank you for participating!')
+        successMsg.setWindowTitle('Student Council Elections')
+        successMsg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
+        successMsg.exec()
 
 if __name__ == "__main__":
     import sys
